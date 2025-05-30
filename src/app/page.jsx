@@ -14,6 +14,7 @@ import ScrollView from './components/ScrollView';
 import mammoth from 'mammoth';
 import 'react-tabs/style/react-tabs.css';
 import { UseSocketControls } from "./components/UseSocketControls";
+import { ClientPageRoot } from 'next/dist/client/components/client-page';
 
 const scrollHeight = 460;
 const scrollWidth = 782;//scrollHeight * 16 / 9=782.22;
@@ -352,26 +353,7 @@ export default function Home() {
   }
 
   const isVideoNndCGPresent = (slug) => {
-    if (file) return ""; // Handle single script case
-    if (!slug) return "No visuals"; // Handle undefined slug
-
-    const mediaList = [slug.media1, slug.media2, slug.media3, slug.media4, slug.media5];
-    const count = mediaList.filter(item => item?.trim()).length; // Count valid media entries
-
-    const totalCount = (slug?.Media ? 1 : 0);
-    var aa;
-
-
-    if (totalCount === 0) {
-      aa = ", (No Visual)";
-    }
-    else if (totalCount === 1) {
-      aa = `, (1 Visual)`;
-    }
-    else {
-      aa = `, (${totalCount} Visuals)`;
-    }
-    return `${aa} (${(slug.graphicsid) ? slug.graphicsid : 'No CG'})`;
+    return ``;
   };
 
 
@@ -714,18 +696,18 @@ export default function Home() {
     const socket = socketRef.current;
     socket.on("connect", () => {
       console.log("SOCKET CONNECTED! from main page", socket.id);
-      setServerAlive(true);
+      // setServerAlive(true);
 
     });
 
     socket.on('connect_error', (error) => {
       console.log(error)
-      setServerAlive(false);
+      // setServerAlive(false);
     });
 
     socket.on('disconnect', () => {
       console.log('Disconnected from server');
-      setServerAlive(false);
+      // setServerAlive(false);
     });
 
     socket.on('speed2', data => {
@@ -760,6 +742,29 @@ export default function Home() {
       .then(res => res.json())
       .then(data => setIp(data.ip))
   }, [])
+
+  useEffect(() => {
+    fetch('/example.txt')
+      .then((res) => res.text())
+      .then((content) => {
+        console.log(content)
+        let bb = [];
+        const lines = content.split(/\r?\n/).map(line => line.trim()).filter(line => line !== ""); // Remove empty lines
+
+        bb = lines.map((line, index) => {
+          const words = line.split(/\s+/).slice(0, 3).join(" "); // Extract first three words
+          return {
+            ...fixdata,
+            ScriptID: dummyScriptid + index,
+            SlugName: words || `Slug${index + 1}`, // Fallback if line is empty
+            Script: line
+          };
+        });
+        setSlugs(bb);
+
+      })
+      .catch((err) => console.error('Error reading file:', err));
+  }, []);
 
   return (
     <div style={{ overflow: "hidden", backgroundColor: '#e0e0d2', }}>
