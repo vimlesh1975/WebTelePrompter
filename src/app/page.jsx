@@ -2,17 +2,15 @@
 import './page1.css'
 
 import { fontLists, fixdata } from "./common.js";
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import NewWindow from "./components/NewWindow";
 import NewWindowforfullscreen from "./components/NewWindowforfullscreen";
 import Scroll from "./components/Scroll";
 import io from "socket.io-client";
 import Casparcg from "./Casparcg";
-import Timer from "./components/Timer";
 import TTS from './components/TTS.jsx'
 import ScrollView from './components/ScrollView';
-import { changenewdatabase } from './store/store'; // Adjust the path as needed
 import mammoth from 'mammoth';
 import 'react-tabs/style/react-tabs.css';
 import { UseSocketControls } from "./components/UseSocketControls";
@@ -31,17 +29,14 @@ export default function Home() {
   const [fontColor, setFontColor] = useState('#ffffff');
   const [fontBold, setFontBold] = useState(false);
   const socketRef = useRef(null);
-  const [useDB, setUseDB] = useState(false);
+
   const [singleScript, setSingleScript] = useState(false);
   const [file, setFile] = useState(null);
   const [ZXZX, setZXZX] = useState(false);
-  const dispatch = useDispatch();
   const storyLines = useSelector((state) => state.storyLinesReducer.storyLines);
   const crossedLines = useSelector((state) => state.crossedLinesReducer.crossedLines);
-  const newdatabase = useSelector((state) => state.newdatabaseReducer.newdatabase);
   const [startPosition, setStartPosition] = useState(355);
   const [speed, setSpeed] = useState(0);
-  const [runOrderTitles, setRunOrderTitles] = useState([]);
   const [selectedRunOrderTitle, setSelectedRunOrderTitle] = useState("0600 Hrs");
   const [slugs, setSlugs] = useState([]);
   const [currentSlug, setCurrentSlug] = useState(0);
@@ -59,8 +54,6 @@ export default function Home() {
   const [doubleClickedPosition, setDoubleClickedPosition] = useState(0);
   const [fontSize, setFontSize] = useState(39);
   const [stopAfterStoryChange, setStopAfterStoryChange] = useState(false);
-  const [stopOnNext, setStopOnNext] = useState(false);
-  const [latestDate, setLatestDate] = useState(null);
   const [allowUnApproved, setAllowUnApproved] = useState(false);
   const [DB_NAME, setDB_NAME] = useState('nrcsnew');
   const [DB_HOST, setDB_HOST] = useState('localhost');
@@ -76,7 +69,6 @@ export default function Home() {
   const textRef2 = useRef(null);
   const contentRefs2 = useRef([]);
 
-  const [serverAlive, setServerAlive] = useState(false);
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -87,7 +79,6 @@ export default function Home() {
   const [usedStory, setUsedStory] = useState([]);
   const [sendUsedStory, setSendUsedStory] = useState(false);
   const [prompterId, setPrompterId] = useState(1);
-  const [databaseConnection, setDatabaseConnection] = useState('false');
   const iframeRef = useRef(null);
   const textarea1Ref = useRef(null);
   const [focusedInput, setFocusedInput] = useState(null);
@@ -172,7 +163,7 @@ export default function Home() {
     return () => {
       window.removeEventListener('message', messageHandler);
     };
-  }, [focusedInput, useDB, file]);
+  }, [focusedInput, file]);
 
 
 
@@ -193,13 +184,6 @@ export default function Home() {
         console.error('Error:', error);
       });
   }, [sendUsedStory, prompterId]);
-
-  // useEffect(() => {
-  //   if (!slugs) return;
-  //   if (!useDB) return;
-  //   updateCurrentStory(currentStoryNumber, selectedRunOrderTitle, slugs[currentStoryNumber - 1]?.ScriptID, usedStory, selectedDate, prompterId);
-  // }, [useDB, currentStoryNumber, selectedRunOrderTitle, updateCurrentStory, slugs, usedStory, selectedDate, prompterId]);
-
 
   const handleDateChange = (event) => {
     const date = event.target.value;
@@ -259,29 +243,12 @@ export default function Home() {
     }
   }
 
-  const getDB_NAME = async () => {
-    try {
-      const res = await fetch('/api/setdbname')
-      const data = await res.json();
-      setDB_NAME(data.DB_NAME);
-      setDB_HOST(data.DB_HOST);
-      setCASPAR_HOST(data.CASPAR_HOST);
-    } catch (error) {
-      console.error(error);
-      setDB_NAME('not set');
-      setDB_HOST('not set');
-      setCASPAR_HOST('not set');
-    }
-  }
+
   const handleTextareaKeyDown = (event) => {
     if (event.code === 'Space') {
       event.stopPropagation(); // Prevent spacebar from bubbling to document
     }
   };
-
-  // useEffect(() => {
-  //   getDB_NAME();
-  // }, [])
 
   useEffect(() => {
     const savedData = localStorage.getItem("WebTelePrompter");
@@ -383,38 +350,15 @@ export default function Home() {
       console.error(error);
     }
   }
-  // useEffect(() => {
-  //   fetchNewsId()
-  // }, []);
-
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       const res = await fetch(
-  //         `/api/ShowRunOrder?NewsId=${selectedRunOrderTitle}&date=${selectedDate}`
-  //       );
-  //       const data = await res.json();
-  //       setSlugs(data.data);
-  //       setUsedStory([data.data[0]?.ScriptID]);
-  //       fetchAllContent(data.data, 0);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }
-  //   if (selectedRunOrderTitle) {
-  //     fetchData();
-  //     setCurrentStoryNumber(1);
-  //   }
-  // }, [selectedRunOrderTitle, selectedDate]);
 
   const isVideoNndCGPresent = (slug) => {
-    if (!useDB && file) return ""; // Handle single script case
+    if (file) return ""; // Handle single script case
     if (!slug) return "No visuals"; // Handle undefined slug
 
     const mediaList = [slug.media1, slug.media2, slug.media3, slug.media4, slug.media5];
     const count = mediaList.filter(item => item?.trim()).length; // Count valid media entries
 
-    const totalCount = newdatabase ? count : (slug?.Media ? 1 : 0);
+    const totalCount = (slug?.Media ? 1 : 0);
     var aa;
 
 
@@ -531,14 +475,6 @@ export default function Home() {
     });
   }, [slugs, handleDoubleClick]);
 
-  // useEffect(() => {
-  //   if (!useDB) { return }
-  //   setCurrentSlug(currentStoryNumber - 1);
-  //   if (!slugs) return;
-  //   setCurrentSlugName(slugs[currentStoryNumber - 1]?.SlugName);
-  // }, [currentStoryNumber, slugs, useDB]);
-
-
   useEffect(() => {
     if (stopAfterStoryChange) {
       setSpeed(0);
@@ -589,7 +525,6 @@ export default function Home() {
   useEffect(() => {
     const socket = socketRef.current;
     if (!socket) return;
-    // socket.emit('bgColor', bgColor);
     socket.emit('scrollContainerStyle', scrollContainerStyle);
 
   }, [scrollContainerStyle]);
@@ -741,7 +676,6 @@ export default function Home() {
     slugs.forEach((item) => {
       text += `${item.SlugName}${(item.DropStory === 1 || item.DropStory === 3) ? '(Story Dropped)' : ''}${!item.approved ? '(Story UnApproved)' : ''}\nZXZX\n${item.Script}\nZCZC\n`;
     });
-    // Remove the last occurrence of "ZCZC\n"
     text = text.replace(/ZCZC\n$/, '');
     const element = document.createElement("a");
     const file = new Blob([text], { type: 'text/plain' });
@@ -783,13 +717,6 @@ export default function Home() {
       setServerAlive(true);
 
     });
-    socket.on("newdatabase", (data) => {
-      dispatch(changenewdatabase(data));
-    });
-
-    socket.on('databaseConnection', data => {
-      setDatabaseConnection(data);
-    });
 
     socket.on('connect_error', (error) => {
       console.log(error)
@@ -818,8 +745,6 @@ export default function Home() {
 
     return () => {
       socket.off("connect");
-      socket.off("newdatabase");
-      socket.off("databaseConnection");
       socket.off("connect_error");
       socket.off("disconnect");
       socket.off("speed2");
@@ -848,8 +773,8 @@ export default function Home() {
             style={{
               minWidth: 348,
               maxWidth: 348,
-              maxHeight: newdatabase ? 725 : 748,
-              minHeight: newdatabase ? 725 : 748,
+              maxHeight: 725,
+              minHeight: 725,
               overflow: "scroll",
             }}
           >
@@ -872,13 +797,11 @@ export default function Home() {
                   margin: 10,
                 }}
               >
-                {/* {val.DropStory} */}
                 <input
                   title={(val.DropStory === 0 || val.DropStory === 2) ? 'Uncheck to Drop' : 'Check to Include'}
                   type="checkbox"
                   checked={val.DropStory === 0 || val.DropStory === 2}
                   onChange={(e) => {
-                    // Correctly updating the array
                     const updatedSlugs = [...slugs]; // Create a copy of the array
                     updatedSlugs[i] = { ...updatedSlugs[i], DropStory: dropStoryValue(val) }; // Modify the object at index i
                     setSlugs(updatedSlugs); // Update state with the modified array
@@ -930,7 +853,7 @@ export default function Home() {
             <b><span>Send Used Story</span></b>
           </label>
 
-          <div title={useDB ? 'Data from database' : `Text file should be like this
+          <div title={`Text file should be like this
             Slugname1
             ZXZX
             Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 
@@ -943,17 +866,7 @@ export default function Home() {
             ZXZX
             Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 `}>
             <label>
-              {/* {" "}
-              <input
-                checked={useDB}
-                type="checkbox"
-                onChange={() => setUseDB((val) => {
-                  setFile(null);
-                  return !val
-                })}
-              />{" "}
-              <span>Use DB</span> */}
-              {!useDB &&
+              {
                 <input
                   type="file"
                   accept=".txt,.docx"
@@ -961,7 +874,7 @@ export default function Home() {
                 />
               }
             </label>
-            {!useDB && file && !ZXZX &&
+            {file && !ZXZX &&
               <label>
                 <input
                   checked={singleScript}
@@ -977,13 +890,6 @@ export default function Home() {
 
           </div>
           <div><button onClick={exportScript}>Export Script</button></div>
-          {/* <div>
-            {JSON.stringify(textRef?.current?.getBoundingClientRect().top,)}
-          </div>
-          <div>
-            {JSON.stringify(textRef?.current?.getBoundingClientRect().height)}
-          </div> */}
-          {/* {JSON.stringify(usedStory)} */}
           <div>
             Prompter ID <input style={{ width: 40 }} min={1} type="number" value={prompterId} onChange={(e) => {
               setUsedStory([]);
@@ -992,7 +898,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* second column */}
         <div style={{ height: '100vh' }}>
 
           <div
@@ -1121,7 +1026,7 @@ export default function Home() {
               </div>
             )}
 
-            {(!useDB && file) ?
+            {(file) ?
               <div>
                 <textarea
                   ref={textarea1Ref}
@@ -1160,7 +1065,7 @@ export default function Home() {
             }
           </div>
           <div style={{ fontSize: 16, fontWeight: "normal", position: 'absolute', top: 770, }}>
-            {!useDB && file && <div><button onClick={saveScript}>Save Script</button></div>}
+            {file && <div><button onClick={saveScript}>Save Script</button></div>}
 
             <TTS content={slugs ? slugs[currentSlug]?.Script : ''} />
             {/* <SpeechToText /> */}
@@ -1356,25 +1261,6 @@ export default function Home() {
               </select>
             </div>
 
-            {/* <Timer
-              callback={timerFunction}
-              interval={5000}
-              stopOnNext={stopOnNext}
-              setStopOnNext={setStopOnNext}
-            /> */}
-            <p style={{ fontWeight: 'bold' }}>
-              Last Update:{" "}
-              {latestDate?.toLocaleString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-                second: "numeric",
-              })}
-            </p>
-
-
             <div>
               For HDMI or VGA output <button
                 onClick={() => {
@@ -1520,7 +1406,7 @@ export default function Home() {
                   setFontColor(e.target.value);
                   socketRef.current.emit('fontColor', e.target.value);
                 }} />
-                <button onClick={() => window.open(`http://${ip}:3000/m`)}>Mobile controllerr</button>
+                <button onClick={() => window.open(`http://${ip}:5000/m`)}>Mobile controllerr</button>
               </div>
 
             </div>
