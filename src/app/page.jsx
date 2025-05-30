@@ -31,7 +31,7 @@ export default function Home() {
   const [fontColor, setFontColor] = useState('#ffffff');
   const [fontBold, setFontBold] = useState(false);
   const socketRef = useRef(null);
-  const [useDB, setUseDB] = useState(true);
+  const [useDB, setUseDB] = useState(false);
   const [singleScript, setSingleScript] = useState(false);
   const [file, setFile] = useState(null);
   const [ZXZX, setZXZX] = useState(false);
@@ -194,11 +194,11 @@ export default function Home() {
       });
   }, [sendUsedStory, prompterId]);
 
-  useEffect(() => {
-    if (!slugs) return;
-    if (!useDB) return;
-    updateCurrentStory(currentStoryNumber, selectedRunOrderTitle, slugs[currentStoryNumber - 1]?.ScriptID, usedStory, selectedDate, prompterId);
-  }, [useDB, currentStoryNumber, selectedRunOrderTitle, updateCurrentStory, slugs, usedStory, selectedDate, prompterId]);
+  // useEffect(() => {
+  //   if (!slugs) return;
+  //   if (!useDB) return;
+  //   updateCurrentStory(currentStoryNumber, selectedRunOrderTitle, slugs[currentStoryNumber - 1]?.ScriptID, usedStory, selectedDate, prompterId);
+  // }, [useDB, currentStoryNumber, selectedRunOrderTitle, updateCurrentStory, slugs, usedStory, selectedDate, prompterId]);
 
 
   const handleDateChange = (event) => {
@@ -279,9 +279,9 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    getDB_NAME();
-  }, [])
+  // useEffect(() => {
+  //   getDB_NAME();
+  // }, [])
 
   useEffect(() => {
     const savedData = localStorage.getItem("WebTelePrompter");
@@ -339,75 +339,6 @@ export default function Home() {
   const handleCloseNewWindow3 = () => {
     setShowNewWindow3(false);
   };
-  const timerFunction = async () => {
-    if (selectedRunOrderTitle === '') {
-      return;
-    }
-    if (!useDB) {
-      return
-    }
-
-    try {
-      const res = await fetch(
-        `/api/ShowRunOrder?NewsId=${selectedRunOrderTitle}&date=${selectedDate}`
-      );
-      const data = await res.json();
-
-      const newSlugsTotal = data.data;
-      if (!newSlugsTotal) return
-      const LastModifiedTimeTotal = newSlugsTotal.map(
-        (slug) => slug.LastModifiedTime
-      );
-      const ScriptLastModifiedTimeTotal = newSlugsTotal.map(
-        (slug) => slug.ScriptLastModifiedTime
-      );
-      const dateArrayTotal = [
-        ...LastModifiedTimeTotal,
-        ...ScriptLastModifiedTimeTotal,
-      ];
-      const newLatestDateTotal = new Date(
-        Math.max(...dateArrayTotal.map((date) => new Date(date)))
-      );
-
-      if (
-        latestDate === null ||
-        newLatestDateTotal > latestDate ||
-        data.data.length !== slugs.length
-      ) {
-        setLatestDate(newLatestDateTotal);
-        setSlugs(data.data);
-      } else {
-      }
-
-      const newSlugs = data.data.slice(doubleClickedPosition);
-      const LastModifiedTime = newSlugs.map((slug) => slug.LastModifiedTime);
-      const ScriptLastModifiedTime = newSlugs.map(
-        (slug) => slug.ScriptLastModifiedTime
-      );
-      const dateArray = [...LastModifiedTime, ...ScriptLastModifiedTime];
-      const newLatestDate = new Date(
-        Math.max(...dateArray.map((date) => new Date(date)))
-      );
-
-      if (
-        latestDate === null ||
-        newLatestDate > latestDate ||
-        data.data.length !== slugs.length
-      ) {
-        if (
-          (data.data[currentStoryNumber - 1]?.DropStory === 1) || (data.data[currentStoryNumber - 1]?.DropStory === 3) ||
-          (data.data[currentStoryNumber - 1]?.Approval === 0)
-        ) {
-          handleDoubleClick(currentStoryNumber);
-        } else {
-          fetchAllContent(newSlugs, doubleClickedPosition);
-        }
-      } else {
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const onclickSlug = (val, i) => {
     if (i < slugs.length) {
@@ -452,29 +383,29 @@ export default function Home() {
       console.error(error);
     }
   }
-  useEffect(() => {
-    fetchNewsId()
-  }, []);
+  // useEffect(() => {
+  //   fetchNewsId()
+  // }, []);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch(
-          `/api/ShowRunOrder?NewsId=${selectedRunOrderTitle}&date=${selectedDate}`
-        );
-        const data = await res.json();
-        setSlugs(data.data);
-        setUsedStory([data.data[0]?.ScriptID]);
-        fetchAllContent(data.data, 0);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    if (selectedRunOrderTitle) {
-      fetchData();
-      setCurrentStoryNumber(1);
-    }
-  }, [selectedRunOrderTitle, selectedDate]);
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const res = await fetch(
+  //         `/api/ShowRunOrder?NewsId=${selectedRunOrderTitle}&date=${selectedDate}`
+  //       );
+  //       const data = await res.json();
+  //       setSlugs(data.data);
+  //       setUsedStory([data.data[0]?.ScriptID]);
+  //       fetchAllContent(data.data, 0);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  //   if (selectedRunOrderTitle) {
+  //     fetchData();
+  //     setCurrentStoryNumber(1);
+  //   }
+  // }, [selectedRunOrderTitle, selectedDate]);
 
   const isVideoNndCGPresent = (slug) => {
     if (!useDB && file) return ""; // Handle single script case
@@ -600,12 +531,12 @@ export default function Home() {
     });
   }, [slugs, handleDoubleClick]);
 
-  useEffect(() => {
-    if (!useDB) { return }
-    setCurrentSlug(currentStoryNumber - 1);
-    if (!slugs) return;
-    setCurrentSlugName(slugs[currentStoryNumber - 1]?.SlugName);
-  }, [currentStoryNumber, slugs, useDB]);
+  // useEffect(() => {
+  //   if (!useDB) { return }
+  //   setCurrentSlug(currentStoryNumber - 1);
+  //   if (!slugs) return;
+  //   setCurrentSlugName(slugs[currentStoryNumber - 1]?.SlugName);
+  // }, [currentStoryNumber, slugs, useDB]);
 
 
   useEffect(() => {
@@ -910,39 +841,7 @@ export default function Home() {
       <div style={{ display: "flex" }}>
         <div style={{ height: '100vh' }}>
           <div>
-            {newdatabase &&
-              <div>
-                <label htmlFor="date-selector">Select a date: </label>
-                <input
-                  id="date-selector"
-                  type="date"
-                  value={selectedDate}
-                  onChange={handleDateChange}
-                  disabled={!useDB}
-                />
-                <span title="Database Status"> {(serverAlive && (databaseConnection === 'true')) ? 'Database 🟢' : 'Database 🔴'}</span>
-
-              </div>
-            }
-          </div>
-
-          <div>
-            RO
-            <select
-              value={selectedRunOrderTitle}
-              onChange={handleSelectionChange}
-              disabled={!useDB}
-            >
-              <option value="" disabled>
-                Select a Run Order
-              </option>
-              {runOrderTitles?.map((runOrderTitle, i) => (
-                <option key={i} value={runOrderTitle.title}>
-                  {runOrderTitle.title}
-                </option>
-              ))}
-            </select>
-            {slugs?.length} Slugs <button onClick={fetchNewsId}>Refresh RO</button>
+            {slugs?.length} Slugs
 
           </div>
           <div
@@ -1044,7 +943,7 @@ export default function Home() {
             ZXZX
             Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 `}>
             <label>
-              {" "}
+              {/* {" "}
               <input
                 checked={useDB}
                 type="checkbox"
@@ -1053,7 +952,7 @@ export default function Home() {
                   return !val
                 })}
               />{" "}
-              <span>Use DB</span>
+              <span>Use DB</span> */}
               {!useDB &&
                 <input
                   type="file"
@@ -1457,12 +1356,12 @@ export default function Home() {
               </select>
             </div>
 
-            <Timer
+            {/* <Timer
               callback={timerFunction}
               interval={5000}
               stopOnNext={stopOnNext}
               setStopOnNext={setStopOnNext}
-            />
+            /> */}
             <p style={{ fontWeight: 'bold' }}>
               Last Update:{" "}
               {latestDate?.toLocaleString(undefined, {

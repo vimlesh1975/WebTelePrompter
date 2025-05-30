@@ -186,7 +186,7 @@ app.prepare().then(async () => {
 
     server.all('*', (req, res) => handle(req, res));
 
-    const PORT = process.env.PORT || 3000;
+    const PORT = process.env.PORT || 5000;
     httpServer.listen(PORT, () => {
         console.log(`Server is running on http://localhost:${PORT}`);
     });
