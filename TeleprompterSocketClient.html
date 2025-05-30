@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socket.IO Client</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    #storyContainer {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      max-width: 600px;
+    }
+
+    #storyContainer h2 {
+      font-size: 24px;
+    }
+
+    #storyContainer p {
+      font-size: 18px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div style="display: flex1;">
+    <div style=" border: 1px solid red;">
+      <h1>Socket.IO Client 1</h1>
+      <h2>Current Story Update</h2>
+      <p id="storyData1">Waiting for updates...</p>
+      <h2>current Story Drop Allow</h2>
+      <p id="currentStoryDropAllow">Waiting for updates...</p>
+    </div>
+    <div style="border: 1px solid red;">
+      <h1>Socket.IO Client 2</h1>
+
+      <h2>Current Story Update</h2>
+      <p id="storyData2">Waiting for updates...</p>
+      <h2>current Story Drop Allow</h2>
+      <p id="currentStoryDropAllow2">Waiting for updates...</p>
+    </div>
+  </div>
+
+
+  <script>
+    const socket1 = io('http://localhost:3000');
+    socket1.on('currentStoryBroadcast', (data) => {
+      console.log(data);
+      if (data.prompterId.toString() === '1') {
+        document.getElementById('storyData1').innerText = `  ${JSON.stringify(data)} `;
+      }
+
+    });
+
+    socket1.on('currentStoryDropAllow', (data) => {
+      if (data.prompterId.toString() === '1') {
+        document.getElementById('currentStoryDropAllow').innerText = `
+          ${JSON.stringify(data)}  
+      `;
+      }
+
+    });
+    socket1.on('connect', () => {
+      console.log('Connected to the server');
+    });
+    socket1.on('disconnect', () => {
+      console.log('Disconnected from the server');
+    });
+
+    const socket2 = io('http://192.168.15.114:3000');
+    socket2.on('currentStoryBroadcast', (data) => {
+      console.log(data);
+      if (data.prompterId.toString() === '2') {
+        document.getElementById('storyData2').innerText = `  ${JSON.stringify(data)} `;
+      }
+    });
+
+    socket2.on('currentStoryDropAllow', (data) => {
+      if (data.prompterId.toString() === '2') {
+        document.getElementById('currentStoryDropAllow2').innerText = `
+        ${JSON.stringify(data)}  
+      `;
+      }
+
+
+    });
+    socket2.on('connect', () => {
+      console.log('Connected to the server');
+    });
+    socket2.on('disconnect', () => {
+      console.log('Disconnected from the server');
+    });
+  </script>
+</body>
+
+</html>

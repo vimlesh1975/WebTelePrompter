@@ -1,0 +1,10 @@
+credentialsfromenv=1
+DB_HOST=dfsdfdf
+DB_USER=fdfd
+DB_PASSWORD=dfdf
+DB_NAME=nrcsnew
+CASPAR_HOST=127.0.0.1
+NEXT_PUBLIC_IP=localhost
+NEWDATABASE=true
+
+GOOGLE_APPLICATION_CREDENTIALS_JSON=`{}`

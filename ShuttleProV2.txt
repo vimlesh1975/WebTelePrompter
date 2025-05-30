@@ -1,0 +1,118 @@
+### Chrome Key Configurations for ShuttlePro v2
+
+1. Control + N   
+2. Control + W
+3. Control + O
+4. Alt + Home
+5. Alt + Left Arrow
+6. Control + H
+7. Shift + Control + O
+8. Control + T
+9. Control + F
+10. F11
+11. Control + F5
+12. Esc
+13. Control + P
+14. Alt + Left Arrow
+15. Alt + Right Arrow
+
+### Jog Dial Configurations
+
+- Jog Left: Control + -
+- Jog Right: Control + =
+
+### Shuttle Configurations
+
+- Shuttle Left
+  - 7: Up Arrow
+  - 6: Up Arrow
+  - 5: Up Arrow
+  - 4: Up Arrow
+  - 3: Up Arrow
+  - 2: Up Arrow
+  - 1: Up Arrow
+
+- Shuttle Centered: Nothing
+
+- Shuttle Right
+  - 1: Down Arrow
+  - 2: Down Arrow
+  - 3: Down Arrow
+  - 4: Down Arrow
+  - 5: Down Arrow
+  - 6: Down Arrow
+  - 7: Down Arrow
+
+### Transition Configurations
+
+- Transition from Left to Center
+  - From 7 to 6: Nothing
+  - From 6 to 5: Nothing
+  - From 5 to 4: Nothing
+  - From 4 to 3: Nothing
+  - From 3 to 2: Nothing
+  - From 2 to 1: Nothing
+  - From 1 to Center: Nothing
+
+- Transition from Center to Right
+  - From Center to 1: Nothing
+  - From 1 to 2: Nothing
+  - From 2 to 3: Nothing
+  - From 3 to 4: Nothing
+  - From 4 to 5: Nothing
+  - From 5 to 6: Nothing
+  - From 6 to 7: Nothing
+
+- Transition from Right to Center
+  - From 7 to 6: Nothing
+  - From 6 to 5: Nothing
+  - From 5 to 4: Nothing
+  - From 4 to 3: Nothing
+  - From 3 to 2: Nothing
+  - From 2 to 1: Nothing
+  - From 1 to Center: Nothing
+
+- Transition from Center to Left
+  - From Center to 1: Nothing
+  - From 1 to 2: Nothing
+  - From 2 to 3: Nothing
+  - From 3 to 4: Nothing
+  - From 4 to 5: Nothing
+  - From 5 to 6: Nothing
+  - From 6 to 7: Nothing
+
+
+Agtive.exe
+
+1 control alt U speed 0
+2 control alt P speed -3
+3 control alt Q previousspeed -1
+4 cntl alt Z Load from start
+5 cntl alt g speed 1
+6 cntrl alt H speed 2
+7 Contl alt J 3
+8 Contl alt K 4
+9 Contl alt L 5
+10 nothing
+11 nothing
+12 nothing
+13 nothing
+
+14 cntl alt N previous story
+15 cntl alt M Next story
+
+Jog Left cntl alt O speed -2
+Jog right cntl alt H speed 2
+
+Shuttle left 4 cntl alt Q previousspeed -1=> Altimately -4
+Shuttle left 3 cntl alt P speed -3
+Shuttle left 2 cntl alt O speed -2
+Shuttle left 1 cntl alt I speed -1
+Shuttle Centred cntl alt U speed 0
+
+Shuttle Right 1 cntrl alt G speed 1
+Shuttle Right 2 cntrl alt H speed 2
+Shuttle Right 3 cntrl alt J speed 3
+Shuttle Right 4 cntrl alt K speed 4
+
+

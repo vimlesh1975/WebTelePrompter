@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Document</title>
+                            <script name="graphics-data-definition" type="application/json+gdd">
+    {"$schema": "https://superflytv.github.io/GraphicsDataDefinition/gdd-meta-schema/v1/schema.json",
+    "designerSoftware":"RCC",
+    "type": "object",
+    "properties": {"ccg_f1":{"type":"string","label":"label","description":"textbox","default":"255","gddType":"single-line","pattern":""},"ccg_f0":{"type":"string","label":"label","description":"textbox","default":"ccg_75","gddType":"single-line","pattern":""}}
+  }
+  </script>
+  <script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function() {
+    window.gddSchema = JSON.parse(document.querySelector('head > script[name="graphics-data-definition"]').innerHTML);
+  });
+</script>
+
+                            <link rel="stylesheet" href="main.css">
+                                <link rel="stylesheet" href="main2.css">
+                                </head>
+                                <body>
+                                    <script>
+                                        document.body.addEventListener('keypress', function(e) {
+                if(e.key.toUpperCase() === "S") {stop(); }
+              });
+                                        if (screen.colorDepth === 0) {
+                var css = '[id^=ccg] {display: none; }',
+                                        head = document.head || document.getElementsByTagName('head')[0],
+                                        style = document.createElement('style');
+                                        head.appendChild(style);
+                                        style.type = 'text/css';
+                                        if (style.styleSheet) {
+                                            // This is required for IE8 and below.
+                                            style.styleSheet.cssText = css;
+                } else {
+                                            style.appendChild(document.createTextNode(css));
+                }
+            }
+
+                                        const elementToObserve = document.body;
+            const observer = new MutationObserver(() => {
+                                            document.body.style.margin = '0';
+                                        document.body.style.padding = '0';
+                                        document.body.style.overflow = 'hidden';
+                                        var aa = document.getElementsByTagName('div')[0];
+                                        aa.style.zoom=(192000/1920)+'%';
+                                        observer.disconnect();
+            });
+                                        observer.observe(elementToObserve, {subtree: true, childList: true })
+
+                                        var dataCaspar = { };
+
+                                        function escapeHtml(unsafe) {
+            return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            }
+
+                                    // Parse templateData into an XML object
+                                    function parseCaspar(str) {
+            var xmlDoc;
+                                    if (window.DOMParser) {
+                                        parser = new DOMParser();
+                                    xmlDoc = parser.parseFromString(str, "text/xml");
+            }
+                                    dataCaspar = XML2JSON(xmlDoc.documentElement.childNodes);
+            }
+
+
+                                    // Make the XML templateData message into a more simple key:value object
+                                    function XML2JSON(node) {
+            var data = { }; // resulting object
+                                    for (k = 0; k < node.length; k++) {
+            var idCaspar = node[k].getAttribute("id");
+                                    var valCaspar = node[k].childNodes[0].getAttribute("value");
+                                    if (idCaspar != undefined && valCaspar != undefined) {
+                                        data[idCaspar] = valCaspar;
+            };
+            }
+                                    return data;
+            }
+
+                                    // Main function to insert data
+                                    function dataInsert(dataCaspar) {
+                                      for (var idCaspar in dataCaspar) {
+                                          var idTemplate = document.getElementById(idCaspar);
+                                          if (idTemplate != undefined) {
+                                              var idtext = idTemplate.getElementsByTagName('text')[0];
+                                              var idimage = idTemplate.getElementsByTagName('image')[0];
+                          
+                                              if (idtext != undefined) {
+                                                  const lines =idTemplate.getElementsByTagName('extraproperty')[0].getAttribute('lines');
+                                                  if (lines === '1') {
+                                                      idTemplate.getElementsByTagName('text')[0].getElementsByTagName('tspan')[0].innerHTML = escapeHtml(dataCaspar[idCaspar]);
+                                                      idTemplate.style.display = "block";
+                                                      if (idTemplate.getElementsByTagName('extraproperty')[0] != undefined) {
+                                                          var textalign1 = idTemplate.getElementsByTagName('extraproperty')[0].getAttribute('textalign');
+                                                          var width1 = idTemplate.getElementsByTagName('extraproperty')[0].getAttribute('width');
+                                                          var originalFontSize = idTemplate.getElementsByTagName('extraproperty')[0].getAttribute('originalfontsize');
+                                                          if (textalign1 == 'center') {
+                                                              idTemplate.getElementsByTagName('text')[0].setAttribute('xml:space', 'preserve1');
+                                                              idTemplate.getElementsByTagName('text')[0].style.whiteSpace = "normal";
+                                                              idTemplate.getElementsByTagName('text')[0].getElementsByTagName('tspan')[0].setAttribute('x', '0');
+                                                              idTemplate.getElementsByTagName('text')[0].getElementsByTagName('tspan')[0].setAttribute('text-anchor', 'middle');
+                                                          }
+                                                          if (textalign1 == 'right') {
+                                                              idTemplate.getElementsByTagName('text')[0].setAttribute('xml:space', 'preserve1');
+                                                              idTemplate.getElementsByTagName('text')[0].style.whiteSpace = 'normal';
+                                                              idTemplate.getElementsByTagName('text')[0].getElementsByTagName('tspan')[0].setAttribute('x', width1 / 2);
+                                                              idTemplate.getElementsByTagName('text')[0].getElementsByTagName('tspan')[0].setAttribute('text-anchor', 'end');
+                                                          }
+                                                          idTemplate.getElementsByTagName('text')[0].setAttribute('font-size', originalFontSize);
+                                                          do {
+                                                              var dd = idTemplate.getElementsByTagName('text')[0].getAttribute('font-size');
+                                                              idTemplate.getElementsByTagName('text')[0].setAttribute('font-size', dd - 1);
+                                                              var width2 = idTemplate.getElementsByTagName('text')[0].getElementsByTagName('tspan')[0].getBBox().width;
+                                                          } while (width2 > width1);
+                                                      }
+                                                  }
+                                                  else {
+                                                    idTemplate.style.display = "block";
+                                                    var textElement = idTemplate.getElementsByTagName('text')[0];
+                                                    var existingTspans = Array.from(textElement.getElementsByTagName('tspan'));
+                                                    var initialX = existingTspans[0].getAttribute('x');
+                                                    var initialY = existingTspans[0].getAttribute('y');
+                                                    var initialDy = existingTspans[1].getAttribute('y') - existingTspans[0].getAttribute('y');
+                                                    var newData = escapeHtml(dataCaspar[idCaspar]);
+                                                    var dataSegments = newData.split('CRLF');
+                                                    var maxWidth = idTemplate.getElementsByTagName('extraproperty')[0].getAttribute('width');
+                        
+                                                    function splitTextIntoLines(text, maxWidth) {
+                                                        var words = text.split(' ');
+                                                        var lines = [];
+                                                        var currentLine = '';
+                                                        words.forEach(function (word) {
+                                                            var testLine = currentLine.length === 0 ? word : currentLine + ' ' + word;
+                                                            var testWidth = textElement.getSubStringLength(0, testLine.length);
+                        
+                                                            if (testWidth > maxWidth) {
+                                                                lines.push(currentLine);
+                                                                currentLine = word;
+                                                            } else {
+                                                                currentLine = testLine;
+                                                            }
+                                                        });
+                                                        lines.push(currentLine);
+                                                        return lines;
+                                                    }
+                        
+                                                    var tspans = [];
+                                                    var previoustxtlines = 0;
+                        
+                                                    dataSegments.forEach(function (segment, i) {
+                                                        if (segment.trim() === '') {
+                                                          segment=' ';
+                                                        }
+                                                        textElement.innerHTML = segment;
+                                                        var txtlines = splitTextIntoLines(segment, maxWidth);
+                                                        txtlines.forEach(function (line, j) {
+                                                            var tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+                                                            tspan.textContent = line;
+                                                            tspan.setAttribute('x', initialX);
+                                                            tspan.setAttribute('y', parseInt(initialY) + (parseInt(initialDy) * (previoustxtlines + j)));
+                                                            tspans.push(tspan);
+                                                        });
+                                                        previoustxtlines += txtlines.length;
+                                                    });
+                                                    textElement.innerHTML = '';
+                                                    if (tspans.length === 1) {
+                                                        var tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+                                                        tspan.textContent = ' ';
+                                                        tspan.setAttribute('x', initialX);
+                                                        tspan.setAttribute('y', parseInt(initialY) + parseInt(initialDy));
+                                                        tspans.push(tspan);
+                                                    }
+                        
+                                                    tspans.forEach(function (tspan) {
+                                                        textElement.appendChild(tspan);
+                                                    });
+                        
+                                                  }
+                                              }
+                          
+                          
+                                              else if (idimage != undefined) {
+                                                  idTemplate.getElementsByTagName('image')[0].setAttribute('xlink:href', escapeHtml(dataCaspar[idCaspar]));
+                                                  idTemplate.getElementsByTagName('image')[0].setAttribute('preserveAspectRatio', 'none');
+                                                  idTemplate.style.display = "block";
+                                              }
+                                          }
+                                      }
+                                  }
+
+                                    // Call for a update of data from CasparCG client
+                                    function update(str) {
+                                        parseCaspar(str); // Parse templateData into an XML object
+                                    dataInsert(dataCaspar); // Insert data
+            }
+
+                                    // insert data from CasparCg client when activated
+                                    function play(str) {
+                                        parseCaspar(str); // Parse templateData into an XML object
+                                    dataInsert(dataCaspar); // Insert data
+            // gwd.actions.timeline.gotoAndPlay('document.body', 'start');
+            }
+                                    function stop() {
+                                        document.body.innerHTML = '' ;
+            }
+                                    function updatestring(str1, str2) {
+                                        document.getElementById(str1).getElementsByTagName('text')[0].getElementsByTagName('tspan')[0].innerHTML = str2;
+                                    document.getElementById(str1).style.display = "block";
+                                    if (document.getElementById(str1).getElementsByTagName('extraproperty')[0] != undefined) {
+                    var textalign1 = document.getElementById(str1).getElementsByTagName('extraproperty')[0].getAttribute('textalign');
+                                    var width1 = document.getElementById(str1).getElementsByTagName('extraproperty')[0].getAttribute('width');
+                                    var originalFontSize =  document.getElementById(str1).getElementsByTagName('extraproperty')[0].getAttribute('originalfontsize');
+                                    if (textalign1 == 'center') {
+                                        document.getElementById(str1).getElementsByTagName('text')[0].setAttribute('xml:space', 'preserve1');
+                                    document.getElementById(str1).getElementsByTagName('text')[0].style.whiteSpace = "normal";
+                                    document.getElementById(str1).getElementsByTagName('text')[0].getElementsByTagName('tspan')[0].setAttribute('x', '0');
+                                    document.getElementById(str1).getElementsByTagName('text')[0].getElementsByTagName('tspan')[0].setAttribute('text-anchor', 'middle');
+                    }
+                                    if (textalign1 == 'right') {
+                                        document.getElementById(str1).getElementsByTagName('text')[0].setAttribute('xml:space', 'preserve1');
+                                    document.getElementById(str1).getElementsByTagName('text')[0].style.whiteSpace = 'normal';
+                                    document.getElementById(str1).getElementsByTagName('text')[0].getElementsByTagName('tspan')[0].setAttribute('x', width1 / 2);
+                                    document.getElementById(str1).getElementsByTagName('text')[0].getElementsByTagName('tspan')[0].setAttribute('text-anchor', 'end');
+                    }
+                                    document.getElementById(str1).getElementsByTagName('text')[0].setAttribute('font-size', originalFontSize);
+                                    do {
+                        var dd = document.getElementById(str1).getElementsByTagName('text')[0].getAttribute('font-size');
+                                    document.getElementById(str1).getElementsByTagName('text')[0].setAttribute('font-size', dd - 1);
+                                    var width2 = document.getElementById(str1).getElementsByTagName('text')[0].getElementsByTagName('tspan')[0].getBBox().width;
+                    } while (width2 > width1);
+                }
+            }
+                                    function updateimage(str1, str2) {
+                                        document.getElementById(str1).getElementsByTagName('image')[0].setAttribute('xlink:href', str2);
+                                    document.getElementById(str1).getElementsByTagName('image')[0].setAttribute('preserveAspectRatio', 'none');
+                                    document.getElementById(str1).style.display = "block";
+            }
+
+                                </script>
+                                <div> <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="1920" height="1080" viewBox="0 0 1920 1080" xml:space="preserve">
+<desc>Created with Fabric.js 5.3.0</desc>
+<defs>
+</defs>
+<g transform="matrix(1.95 0 0 1.95 191.01 957.39)" id="id_80"  >
+<linearGradient id="SVGID_81" gradientUnits="objectBoundingBox" gradientTransform="matrix(1 0 0 1 0 0)"  x1="0" y1="0" x2="0" y2="1">
+<stop offset="0%" style="stop-color:#ffffff;stop-opacity: 0.2"/>
+<stop offset="50%" style="stop-color:#ffffff;stop-opacity: 1"/>
+<stop offset="100%" style="stop-color:#ffffff;stop-opacity: 0.2"/>
+</linearGradient>
+<filter id="SVGID_80" y="-20%" height="140%" x="-20%" width="140%" >
+	<feGaussianBlur in="SourceAlpha" stdDeviation="0"></feGaussianBlur>
+	<feOffset dx="0" dy="0" result="oBlur" ></feOffset>
+	<feFlood flood-color="rgb(0,0,0)" flood-opacity="1"/>
+	<feComposite in2="oBlur" operator="in" />
+	<feMerge>
+		<feMergeNode></feMergeNode>
+		<feMergeNode in="SourceGraphic"></feMergeNode>
+	</feMerge>
+</filter>
+<circle style="stroke: rgb(255,255,255); stroke-width: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: url(#SVGID_81); fill-rule: nonzero; opacity: 1;filter: url(#SVGID_80);" vector-effect="non-scaling-stroke"  class="class_80" cx="0" cy="0" r="50" />
+</g>
+<g transform="matrix(1 0 0 1 185.68 961.79)" style="filter: url(#SVGID_79);" id="ccg_f1"  >
+<filter id="SVGID_79" y="-20%" height="140%" x="-20%" width="140%" >
+	<feGaussianBlur in="SourceAlpha" stdDeviation="0"></feGaussianBlur>
+	<feOffset dx="0" dy="0" result="oBlur" ></feOffset>
+	<feFlood flood-color="rgb(0,0,0)" flood-opacity="1"/>
+	<feComposite in2="oBlur" operator="in" />
+	<feMerge>
+		<feMergeNode></feMergeNode>
+		<feMergeNode in="SourceGraphic"></feMergeNode>
+	</feMerge>
+</filter>
+<extraproperty textAlign="center" width="191.16620061029414" originalFontSize="87" lines=1></extraproperty>
+		<text xml:space="preserve" class="class_80" font-family="Arial" font-size="87" font-style="normal" font-weight="bold" style="stroke: rgb(0,0,0); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-72.58" y="27.33" >255</tspan></text>
+</g>
+<g transform="matrix(1.49 0 0 1 1005.15 962.29)" id="id_7"  >
+<linearGradient id="SVGID_71" gradientUnits="objectBoundingBox" gradientTransform="matrix(1 0 0 1 0 0)"  x1="0" y1="0" x2="0" y2="1">
+<stop offset="0%" style="stop-color:#ffffff;stop-opacity: 0.2"/>
+<stop offset="50%" style="stop-color:#ffffff;stop-opacity: 1"/>
+<stop offset="100%" style="stop-color:#ffffff;stop-opacity: 0.2"/>
+</linearGradient>
+<filter id="SVGID_7" y="-60%" height="220%" x="-23%" width="146%" >
+	<feGaussianBlur in="SourceAlpha" stdDeviation="15"></feGaussianBlur>
+	<feOffset dx="0" dy="0" result="oBlur" ></feOffset>
+	<feFlood flood-color="rgb(0,0,0)" flood-opacity="1"/>
+	<feComposite in2="oBlur" operator="in" />
+	<feMerge>
+		<feMergeNode></feMergeNode>
+		<feMergeNode in="SourceGraphic"></feMergeNode>
+	</feMerge>
+</filter>
+<rect style="stroke: rgb(255,255,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: url(#SVGID_71); fill-rule: nonzero; opacity: 0.9;filter: url(#SVGID_7);" vector-effect="non-scaling-stroke"  class="class_7" x="-467.5" y="-37.400000000000006" rx="10" ry="10" width="935" height="74.80000000000001" />
+</g>
+<g transform="matrix(1 0 0 1 1005.74 965.59)" style="filter: url(#SVGID_75);" id="ccg_f0"  >
+<filter id="SVGID_75" y="-20%" height="140%" x="-20%" width="140%" >
+	<feGaussianBlur in="SourceAlpha" stdDeviation="0"></feGaussianBlur>
+	<feOffset dx="0" dy="0" result="oBlur" ></feOffset>
+	<feFlood flood-color="rgb(0,0,0)" flood-opacity="1"/>
+	<feComposite in2="oBlur" operator="in" />
+	<feMerge>
+		<feMergeNode></feMergeNode>
+		<feMergeNode in="SourceGraphic"></feMergeNode>
+	</feMerge>
+</filter>
+<extraproperty textAlign="left" width="1356.2301904415833" originalFontSize="55" lines=1></extraproperty>
+		<text xml:space="preserve" class="class_75" font-family="Arial" font-size="55" font-style="normal" font-weight="bold" style="stroke: rgb(0,0,0); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-678.12" y="17.28" >ccg_75</tspan></text>
+</g>
+</svg>  </div>
+                            </body>
+                            <script src="main.js"></script>
+                            <script src="main2.js"></script>
+                        </html>

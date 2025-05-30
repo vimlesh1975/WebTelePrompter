@@ -1,0 +1,9 @@
+flip new window done ✅ 02.08.2024
+too many sql connection  - bug ✅ 12.08.24
+too many casparcg connection- bug ✅ 12.08.24
+some difference in screen and caspar output ✅ 12.08.24
+
+dropped story
+settings
+
+
