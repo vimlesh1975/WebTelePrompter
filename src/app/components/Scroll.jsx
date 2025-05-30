@@ -1,10 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import dynamic from 'next/dynamic';
-import Triangles from './Triangles';
 import io from 'socket.io-client';
-import Count from './Count';
 import ScrollView from './ScrollView';
 import { changeStoryLines, changeCrossedLines } from '../store/store';
 
@@ -14,7 +11,6 @@ function moveZerosToFront(arr) {
     return [...arr.filter(n => n === 0), ...arr.filter(n => n !== 0)];
 }
 
-const Clock = dynamic(() => import('./Clock'), { ssr: false });
 
 const Scroll = ({ scrollContainerStyle, scrollingTextStyle,
     currentFont, fontBold, isRTL, fontColor,
@@ -30,7 +26,6 @@ const Scroll = ({ scrollContainerStyle, scrollingTextStyle,
     const storyLines = useSelector((state) => state.storyLinesReducer.storyLines);
     const crossedLines = useSelector((state) => state.crossedLinesReducer.crossedLines);
 
-    const containerRef = useRef(null);
     const socketRef = useRef(null);
 
     const baseWidth = 1920;
