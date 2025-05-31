@@ -1374,17 +1374,7 @@ export default function Home() {
                       }}
                     />
                   </div>
-                  <div>
-                    DB_NAME:
-                    <input
-                      type="text"
-                      value={DB_NAME}
-                      style={{ width: 100 }}
-                      onChange={(e) => {
-                        setDB_NAME(e.target.value);
-                      }}
-                    />
-                  </div>
+
                   <div>
                     CASPAR_HOST:
                     <input
