@@ -115,7 +115,7 @@ export default function Home({ scrollingTextStyle, scrollContainerStyle, current
             onClick={() => {
               endpoint({
                 action: 'endpoint',
-                command: `Play 1-97 [html] "http://${IP}:3000/CasparcgOutput"`,
+                command: `Play 1-97 [html] "http://${IP}:5000/CasparcgOutput"`,
               });
 
               playOnSecondChannelinFlippedMode();
@@ -135,7 +135,7 @@ export default function Home({ scrollingTextStyle, scrollContainerStyle, current
                 socketRef.current.emit('scrollContainerStyle', scrollContainerStyle);
                 socketRef.current.emit('scrollingTextStyle', scrollingTextStyle);
 
-              }, 3000);
+              }, 5000);
             }
             }
           >
@@ -150,7 +150,7 @@ export default function Home({ scrollingTextStyle, scrollContainerStyle, current
             onClick={() => {
               endpoint({
                 action: 'endpoint',
-                command: `play 1-97 [html] http://${IP}:3000/webrtc.html`,
+                command: `play 1-97 [html] http://${IP}:5000/webrtc.html`,
               });
               playOnSecondChannelinFlippedMode();
             }
