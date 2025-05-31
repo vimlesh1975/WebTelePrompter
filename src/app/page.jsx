@@ -385,11 +385,11 @@ export default function Home() {
     }
   };
 
-  const handleSelectionChange = (e) => {
+  const handleSelectionChange = () => {
     setSpeed(0);
     setDoubleClickedPosition(0);
-    const value = e.target.value;
-    setSelectedRunOrderTitle(value);
+    // const value = e.target.value;
+    // setSelectedRunOrderTitle(value);
     setCurrentSlug(0);
     if (slugs.length > 0) {
       setCurrentSlugName(slugs[0].SlugName);
@@ -400,7 +400,7 @@ export default function Home() {
     if (i === 0) {
       setUsedStory(val => [...val, slugs[0]?.ScriptID]);
     }
-    setStopOnNext(true); // Signal to skip the callback
+    // setStopOnNext(true); // Signal to skip the callback
     if (i < slugs.length) {
       const newSlugs = slugs.slice(i);
       fetchAllContent(newSlugs, i);
@@ -761,6 +761,18 @@ export default function Home() {
           };
         });
         setSlugs(bb);
+        const i = 0;
+        const newSlugs = bb.slice(i);
+        fetchAllContent(newSlugs, i);
+        setSpeed(0);
+        setCurrentStoryNumber(i + 1);
+        const newLoggedPositions = new Set();
+        setLoggedPositions(newLoggedPositions);
+        setDoubleClickedPosition(i);
+        setNewPosition(startPosition);
+
+        setCurrentSlug(i);
+        setCurrentSlugName(bb[i].SlugName);
 
       })
       .catch((err) => console.error('Error reading file:', err));
@@ -1403,6 +1415,7 @@ export default function Home() {
 
               </div>
               <div>
+                {currentStoryNumber}
                 Bg Color <input type="color" value={bgColor} onChange={e => {
                   setbgColor(e.target.value);
                   socketRef.current.emit('bgColor', e.target.value);
