@@ -1364,18 +1364,6 @@ export default function Home() {
 
                 <div style={{ display: 'flex', border: '1px solid red' }}>
                   <div>
-                    DB_HOST:
-                    <input
-                      type="text"
-                      value={DB_HOST}
-                      style={{ width: 100 }}
-                      onChange={(e) => {
-                        setDB_HOST(e.target.value);
-                      }}
-                    />
-                  </div>
-
-                  <div>
                     CASPAR_HOST:
                     <input
                       type="text"
