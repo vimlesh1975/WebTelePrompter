@@ -11,8 +11,6 @@ Double click start Prompter.bat file from unzipped teleprompter folder
 
 Open http://localhost:5000 in browser
 
-![alt text](image.png)
-
 
 choose a text or Docx file. Double click on required slug name, and click on required speed like 1 to start. Right click to stop and play with previous speed.
 
@@ -36,4 +34,3 @@ Teleprompter can be seen vertically scrolling on screen in the software itself.
 
 9. Slug can be edited by speaking on microphone also, That can be translated also.
 
-![alt text](image-1.png)
