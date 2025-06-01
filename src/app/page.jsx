@@ -928,16 +928,16 @@ export default function Home() {
             </div>
           </div>
           <div style={{ fontSize: 16, fontWeight: "normal", position: 'absolute', top: 770, }}>
-            {file && <div><button onClick={saveScript}>Save Script</button></div>}
+            <div><button onClick={saveScript}>Save Script</button></div>
 
             <TTS content={slugs ? slugs[currentSlug]?.Script : ''} />
-            {file && <iframe
+            <iframe
               ref={iframeRef}
               width="750"
               height="40"
               allow="microphone"
               title="External Content"
-            ></iframe>}
+            ></iframe>
           </div>
         </div>
         {/* Third column */}
