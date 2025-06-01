@@ -44,7 +44,7 @@ function SpeechToText() {
             }
         }, 500);
         return () => clearTimeout(debounceTimer.current);
-    }, [transcript, lastTranscript]);
+    }, [transcript, lastTranscript, directtoScript]);
 
 
     const requestParentText = () => {
@@ -98,7 +98,7 @@ function SpeechToText() {
         } finally {
             setLoading(false);
         }
-    }, [targetLanguage, transcript]); // Add all dependencies
+    }, [targetLanguage]); // Add all dependencies
 
     return (
         <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: 940, maxHeight: 100 }}>

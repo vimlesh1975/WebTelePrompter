@@ -140,7 +140,6 @@ export default function Home() {
         'value' in event.data
       ) {
         if (focusedInput) {
-          const aa = currentSlug;
 
           if (event.data.replace) {
             const updatedSlugs = [...slugs];
@@ -166,40 +165,9 @@ export default function Home() {
     };
   }, [focusedInput, file]);
 
-
-
-
-  const updateCurrentStory = useCallback((curstory, curbulletin, ScriptID, usedStory, selectedDate, prompterId) => {
-    if (!curbulletin) return;
-    if (!ScriptID) return;
-    fetch('/api/currentStory', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ curstory, curbulletin, ScriptID: sendUsedStory ? ((usedStory.length === 0) ? 123456478 : ScriptID) : 123456789, usedStory: sendUsedStory ? usedStory : [], selectedDate, prompterId }),
-
-    })
-      .then(response => response.json())
-      .then(data => {
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-  }, [sendUsedStory, prompterId]);
-
-  const handleDateChange = (event) => {
-    const date = event.target.value;
-    setSelectedDate(date)
-
-    setSpeed(0);
-    setDoubleClickedPosition(0);
-  };
-
   useEffect(() => {
     readFile(file);
   }, [singleScript])
-
-
-
 
 
   useEffect(() => {
@@ -385,16 +353,6 @@ export default function Home() {
     }
   };
 
-  const handleSelectionChange = () => {
-    setSpeed(0);
-    setDoubleClickedPosition(0);
-    // const value = e.target.value;
-    // setSelectedRunOrderTitle(value);
-    setCurrentSlug(0);
-    if (slugs.length > 0) {
-      setCurrentSlugName(slugs[0].SlugName);
-    }
-  };
 
   const handleDoubleClick = (i) => {
     if (i === 0) {
