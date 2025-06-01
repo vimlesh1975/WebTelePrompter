@@ -14,7 +14,6 @@ import ScrollView from './components/ScrollView';
 import mammoth from 'mammoth';
 import 'react-tabs/style/react-tabs.css';
 import { UseSocketControls } from "./components/UseSocketControls";
-import { ClientPageRoot } from 'next/dist/client/components/client-page';
 
 const scrollHeight = 460;
 const scrollWidth = 782;//scrollHeight * 16 / 9=782.22;
@@ -38,7 +37,6 @@ export default function Home() {
   const crossedLines = useSelector((state) => state.crossedLinesReducer.crossedLines);
   const [startPosition, setStartPosition] = useState(355);
   const [speed, setSpeed] = useState(0);
-  const [selectedRunOrderTitle, setSelectedRunOrderTitle] = useState("0600 Hrs");
   const [slugs, setSlugs] = useState([]);
   const [currentSlug, setCurrentSlug] = useState(0);
   const [currentSlugName, setCurrentSlugName] = useState("");
@@ -55,9 +53,6 @@ export default function Home() {
   const [doubleClickedPosition, setDoubleClickedPosition] = useState(0);
   const [fontSize, setFontSize] = useState(39);
   const [stopAfterStoryChange, setStopAfterStoryChange] = useState(false);
-  const [allowUnApproved, setAllowUnApproved] = useState(false);
-  const [DB_NAME, setDB_NAME] = useState('nrcsnew');
-  const [DB_HOST, setDB_HOST] = useState('localhost');
   const [CASPAR_HOST, setCASPAR_HOST] = useState('127.0.0.1');
   const [showSettings, setShowSettings] = useState(false);
   const [keyPressed, setKeyPressed] = useState('');
@@ -70,16 +65,7 @@ export default function Home() {
   const textRef2 = useRef(null);
   const contentRefs2 = useRef([]);
 
-  const [selectedDate, setSelectedDate] = useState(() => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const dd = String(today.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  });
   const [usedStory, setUsedStory] = useState([]);
-  const [sendUsedStory, setSendUsedStory] = useState(false);
-  const [prompterId, setPrompterId] = useState(1);
   const iframeRef = useRef(null);
   const textarea1Ref = useRef(null);
   const [focusedInput, setFocusedInput] = useState(null);
@@ -102,8 +88,6 @@ export default function Home() {
     fontSize: parseInt(fontSize * 2.5),
     lineHeight: `${Math.floor(fontSize * 1.5 * 2.5)}px`,
   }), [newPosition, fontSize]);
-
-
   useEffect(() => {
     if (!window.location.origin.includes('vercel')) {
       fetch('/api/fonts')
@@ -112,26 +96,22 @@ export default function Home() {
         .catch((err) => console.error(err));
     }
   }, []);
-
   useEffect(() => {
     const addr = `${window.location.origin}/SpeechToText`;
     if (iframeRef.current) {
       iframeRef.current.src = addr;
     }
-
     const handleFocus = (event) => {
       if (textarea1Ref.current) textarea1Ref.current.style.borderColor = 'red';
       event.target.style.borderColor = 'red';
       setFocusedInput(event.target);
     };
-
     const inputs = [textarea1Ref.current];
     inputs.forEach((input) => {
       if (input) {
         input.addEventListener('focus', handleFocus);
       }
     });
-
     const messageHandler = (event) => {
       if (
         event.data &&
@@ -157,21 +137,15 @@ export default function Home() {
         event.source.postMessage({ textareaValue: focusedInput.value }, event.origin);
       }
     };
-
     window.addEventListener('message', messageHandler);
-
     return () => {
       window.removeEventListener('message', messageHandler);
     };
   }, [focusedInput, file]);
-
   useEffect(() => {
     readFile(file);
   }, [singleScript])
-
-
   useEffect(() => {
-    // Event listener function
     const handleKeyPress = (event) => {
       if (event.key === 'Enter') {
         handleDoubleClick(parseInt(keyPressed) - 1);
@@ -184,14 +158,11 @@ export default function Home() {
       }
     };
 
-    // Add event listener on mount
     window.addEventListener('keydown', handleKeyPress);
-
-    // Cleanup event listener on unmount
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [keyPressed]); // Empty dependency array ensures it runs only once when component mounts
+  }, [keyPressed]);
 
   const changeDB_NAME = async () => {
     try {
@@ -211,14 +182,11 @@ export default function Home() {
       console.error(error);
     }
   }
-
-
   const handleTextareaKeyDown = (event) => {
     if (event.code === 'Space') {
       event.stopPropagation(); // Prevent spacebar from bubbling to document
     }
   };
-
   useEffect(() => {
     const savedData = localStorage.getItem("WebTelePrompter");
     if (savedData) {
@@ -252,7 +220,6 @@ export default function Home() {
       );
     }
   }, []);
-
   useEffect(() => {
     setTimeout(() => {
       const savedData = localStorage.getItem("WebTelePrompter");
@@ -264,25 +231,21 @@ export default function Home() {
       );
     }, 1000);
   }, [fontSize, startPosition, isRTL, bgColor, fontColor, fontBold, currentFont]);
-
   const handleCloseNewWindow = () => {
     setShowNewWindow(false);
   };
-
   const handleCloseNewWindow2 = () => {
     setShowNewWindow2(false);
   };
   const handleCloseNewWindow3 = () => {
     setShowNewWindow3(false);
   };
-
   const onclickSlug = (val, i) => {
     if (i < slugs.length) {
       setCurrentSlug(i);
       setCurrentSlugName(val.SlugName);
     }
   };
-
   useEffect(() => {
     const handleKeyDown = (event) => {
       switch (event.key) {
@@ -309,7 +272,6 @@ export default function Home() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [speed, tempSpeed]);
-
   const fetchNewsId = async () => {
     try {
       const res = await fetch("/api/newsid");
@@ -319,12 +281,9 @@ export default function Home() {
       console.error(error);
     }
   }
-
   const isVideoNndCGPresent = (slug) => {
     return ``;
   };
-
-
   const fetchAllContent = (slicedSlugs, startNumber) => {
     if (!Array.isArray(slicedSlugs) || slicedSlugs.length === 0) {
       return;
@@ -334,7 +293,7 @@ export default function Home() {
     try {
       slicedSlugs.forEach((slug, i) => {
 
-        if ((slug.DropStory === 0 || slug.DropStory === 2) && (slug?.Approval || allowUnApproved)) {
+        if ((slug.DropStory === 0 || slug.DropStory === 2) && (slug?.Approval)) {
           data1[i * 3] = `${startNumber + i + 1} ${slug?.SlugName}${isVideoNndCGPresent(slug)
             }`;
           data1[i * 3 + 1] = slug.Script ? `${slug.Script?.trim().split('$$$$')[0]}` : '';
@@ -384,7 +343,7 @@ export default function Home() {
       if (newIndex < 0) {
         newIndex = slugs.length - 1;
       }
-      while (((slugs[newIndex]?.DropStory === 1) || (slugs[newIndex]?.DropStory) === 3) || (!slugs[newIndex]?.Approval && !allowUnApproved)) {
+      while (((slugs[newIndex]?.DropStory === 1) || (slugs[newIndex]?.DropStory) === 3) || (!slugs[newIndex]?.Approval)) {
         newIndex--;
         if (newIndex < 0) {
           newIndex = slugs.length - 1;
@@ -402,7 +361,7 @@ export default function Home() {
       if (newIndex >= slugs.length) {
         newIndex = 0;
       }
-      while (((slugs[newIndex]?.DropStory === 1) || (slugs[newIndex]?.DropStory) === 3) || (!slugs[newIndex]?.Approval && !allowUnApproved)) {
+      while (((slugs[newIndex]?.DropStory === 1) || (slugs[newIndex]?.DropStory) === 3) || (!slugs[newIndex]?.Approval)) {
         newIndex++;
         if (newIndex >= slugs.length) {
           newIndex = 0;
@@ -620,7 +579,7 @@ export default function Home() {
     const element = document.createElement("a");
     const file = new Blob([text], { type: 'text/plain' });
     element.href = URL.createObjectURL(file);
-    element.download = selectedDate + '_' + selectedRunOrderTitle + "_script.txt";
+    element.download = "_script.txt";
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
   }
@@ -644,28 +603,21 @@ export default function Home() {
 
   const previousRef = useRef();
   previousRef.current = previous;
-
   const fromStartRef = useRef();
   fromStartRef.current = fromStart;
-
-
   useEffect(() => {
     socketRef.current = io();
     const socket = socketRef.current;
     socket.on("connect", () => {
       console.log("SOCKET CONNECTED! from main page", socket.id);
-      // setServerAlive(true);
-
     });
 
     socket.on('connect_error', (error) => {
       console.log(error)
-      // setServerAlive(false);
     });
 
     socket.on('disconnect', () => {
       console.log('Disconnected from server');
-      // setServerAlive(false);
     });
 
     socket.on('speed2', data => {
@@ -682,7 +634,6 @@ export default function Home() {
     socket.on('fromStart2', () => {
       fromStartRef.current?.();
     });
-
     return () => {
       socket.off("connect");
       socket.off("connect_error");
@@ -690,7 +641,6 @@ export default function Home() {
       socket.off("speed2");
       socket.off("next2");
       socket.off("fromStart2");
-
       socket.disconnect();
     }
   }, [])
@@ -728,7 +678,6 @@ export default function Home() {
         setLoggedPositions(newLoggedPositions);
         setDoubleClickedPosition(i);
         setNewPosition(startPosition);
-
         setCurrentSlug(i);
         setCurrentSlugName(bb[i].SlugName);
 
@@ -776,14 +725,14 @@ export default function Home() {
                   title={(val.DropStory === 0 || val.DropStory === 2) ? 'Uncheck to Drop' : 'Check to Include'}
                   type="checkbox"
                   checked={val.DropStory === 0 || val.DropStory === 2}
-                  onChange={(e) => {
+                  onChange={() => {
                     const updatedSlugs = [...slugs]; // Create a copy of the array
                     updatedSlugs[i] = { ...updatedSlugs[i], DropStory: dropStoryValue(val) }; // Modify the object at index i
                     setSlugs(updatedSlugs); // Update state with the modified array
                     fetch('/api/setDropedStory', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ dropstory: dropStoryValue(val), ScriptID: val.ScriptID, bulletindate: selectedDate, bulletinname: selectedRunOrderTitle, prompterId }),
+                      body: JSON.stringify({ dropstory: dropStoryValue(val), ScriptID: val.ScriptID, }),
                     })
                       .then(response => response.json())
                       .then(data => {
@@ -792,7 +741,6 @@ export default function Home() {
                       .catch(error => {
                         console.error('Error:', error);
                       });
-
                   }}
                 />
                 <span title={'ScriptID:-' + val.ScriptID} style={{ fontSize: 30, }}>{i + 1}</span>{usedStory.includes(val.ScriptID) ? '✅' : ' '}
@@ -814,20 +762,6 @@ export default function Home() {
             ))}
           </div>
           <button onClick={() => { setUsedStory([]) }}>Reset used story status</button>
-
-          <label>
-            {" "}
-            <input
-              checked={sendUsedStory}
-              type="checkbox"
-              onChange={() => setSendUsedStory((val) => {
-                setUsedStory([]);
-                return !val
-              })}
-            />{" "}
-            <b><span>Send Used Story</span></b>
-          </label>
-
           <div title={`Text file should be like this
             Slugname1
             ZXZX
@@ -849,32 +783,24 @@ export default function Home() {
                 />
               }
             </label>
-            {file && !ZXZX &&
-              <label>
-                <input
-                  checked={singleScript}
-                  type="checkbox"
-                  onChange={() => setSingleScript((val) => {
-                    return !val
-                  })}
-                />
-                <span>Single Script</span>
-              </label>
-            }
-
-
+            <div>
+              {file && !ZXZX &&
+                <label>
+                  <input
+                    checked={singleScript}
+                    type="checkbox"
+                    onChange={() => setSingleScript((val) => {
+                      return !val
+                    })}
+                  />
+                  <span>Single Script</span>
+                </label>
+              }
+            </div>
           </div>
           <div><button onClick={exportScript}>Export Script</button></div>
-          <div>
-            Prompter ID <input style={{ width: 40 }} min={1} type="number" value={prompterId} onChange={(e) => {
-              setUsedStory([]);
-              setPrompterId(e.target.value);
-            }} />
-          </div>
         </div>
-
         <div style={{ height: '100vh' }}>
-
           <div
             style={{
               border: "1px solid red",
@@ -898,7 +824,6 @@ export default function Home() {
               doubleClickedPosition={doubleClickedPosition}
               newPosition={newPosition}
               currentStoryNumber={currentStoryNumber}
-              selectedRunOrderTitle={selectedRunOrderTitle}
               storyLines={storyLines}
               crossedLines={crossedLines}
               speed={speed}
@@ -937,17 +862,6 @@ export default function Home() {
               />{" "}
               <span>Stop After Story</span>
             </label>
-
-            <label>
-              {" "}
-              <input
-                checked={allowUnApproved}
-                type="checkbox"
-                onChange={() => setAllowUnApproved((val) => !val)}
-              />{" "}
-              <span>Allow UnApproved</span>
-            </label>
-
 
           </div>
           <div style={{ border: "1px solid red", marginBottom: 10 }}>
@@ -993,7 +907,6 @@ export default function Home() {
                   color: "yellow",
                   width: 702,
                   fontFamily: 'Times New Roman',
-
                 }}
               >
                 {currentSlug + 1} {currentSlugName}
@@ -1043,22 +956,17 @@ export default function Home() {
             {file && <div><button onClick={saveScript}>Save Script</button></div>}
 
             <TTS content={slugs ? slugs[currentSlug]?.Script : ''} />
-            {/* <SpeechToText /> */}
             {file && <iframe
               ref={iframeRef}
               width="750"
               height="40"
-              // style={{ border: '1px solid black' }}
               allow="microphone"
               title="External Content"
             ></iframe>}
           </div>
-
         </div>
-
         {/* Third column */}
         <div style={{ height: '100vh' }}>
-
           <div>
             <Scroll
               scrollContainerStyle={scrollContainerStyle}
@@ -1084,7 +992,6 @@ export default function Home() {
               currentStoryNumber={currentStoryNumber}
               setCurrentStoryNumber={setCurrentStoryNumber}
               speed={speed}
-              selectedRunOrderTitle={selectedRunOrderTitle}
               slugs={slugs}
               newsReaderText={newsReaderText}
               setSpeed={setSpeed}
@@ -1098,7 +1005,6 @@ export default function Home() {
               >
                 <ScrollView contentRefs={contentRefs2} textRef={textRef2} scrollContainerStyle={scrollContainerStyle} scrollingTextStyle={scrollingTextStyle} currentFont={currentFont} fontBold={fontBold} isRTL={isRTL} fontColor={fontColor} allContent={allContent} currentStoryNumber={currentStoryNumber} crossedLines={crossedLines} storyLines={storyLines} slugs={slugs} newsReaderText={newsReaderText} showClock={showClock} startPosition={startPosition} />
               </NewWindow>
-
             )}
             {showNewWindow2 && (
               <NewWindow
@@ -1175,7 +1081,6 @@ export default function Home() {
               <button onClick={() => setSpeed(-6)}>-6</button>
               <button onClick={() => setSpeed(-7)}>-7</button>
               <button title='Decrease speed by 1' onClick={() => setSpeed((val) => val - 1)}>--1</button>
-
             </div>
             <div>
               Speed: {speed}
@@ -1203,7 +1108,6 @@ export default function Home() {
                 <b><span>Right to left for urdu</span></b>
               </label>
             </div>
-
             <div style={{ textAlign: "left" }}>
               <label>
                 {" "}
@@ -1275,21 +1179,15 @@ export default function Home() {
 
                   const socket = socketRef.current;
                   if (!socket) return;
-
-                  // socket.emit('newPosition', newPosition);
                   socket.emit('setCurrentStoryNumber', currentStoryNumber);
                   socket.emit('storyLines', storyLines);
                   socket.emit('crossedLines', crossedLines);
                   socket.emit('allContent', allContent);
                   socket.emit('setSlugs', slugs);
-
-                  // socket.emit('setFontSize', fontSize * 2.5);
                   socket.emit('setStartPosition', startPosition);
-
                   socket.emit('setShowClock', showClock);
                   socket.emit('setNewsReaderText', newsReaderText);
                   socket.emit('rtl', isRTL);
-                  // socket.emit('bgColor', bgColor);
                   socket.emit('fontColor', fontColor);
                   socket.emit('fontBold', fontBold);
                   socket.emit('currentFont', currentFont);
@@ -1299,7 +1197,6 @@ export default function Home() {
                 }, 3000);
               }}>Test</button>
             </div>
-
             <button onClick={() => setShowSettings(val => !val)}>{showSettings ? 'Hide Setting' : 'Show Setting'}</button>
             <div style={{ display: showSettings ? '' : 'none' }}>
               <div>
@@ -1319,7 +1216,6 @@ export default function Home() {
                     setStartPosition(e.target.value);
                   }}
                 />
-
                 <div style={{ display: 'flex', border: '1px solid red' }}>
                   <div>
                     CASPAR_HOST:
@@ -1332,11 +1228,8 @@ export default function Home() {
                       }}
                     />
                     <button onClick={changeDB_NAME}>Set</button>
-
                   </div>
-
                 </div>
-
                 <div
                   style={{
                     display: "flex",
@@ -1345,10 +1238,8 @@ export default function Home() {
                     height: "100%",
                   }}
                 >
-
                   <UseSocketControls speed={speed} setSpeed={setSpeed} tempSpeed={tempSpeed} setTempSpeed={setTempSpeed} fromStart={fromStart} handleDoubleClick={handleDoubleClick} slugs={slugs} currentStoryNumber={currentStoryNumber} onclickSlug={onclickSlug} previous={previous} next={next} />
                 </div>
-
               </div>
               <div>
                 {currentStoryNumber}
@@ -1362,16 +1253,10 @@ export default function Home() {
                 }} />
                 <button onClick={() => window.open(`http://${ip}:5000/m`)}>Mobile controllerr</button>
               </div>
-
             </div>
-
           </div>
-
         </div>
-
       </div>
-
-
     </div>
   );
 }
