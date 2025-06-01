@@ -566,20 +566,7 @@ export default function Home() {
     readFile(selectedFile);
   };
 
-  const exportScript = () => {
-    if (!slugs) return;
-    let text = '';
-    slugs.forEach((item) => {
-      text += `${item.SlugName}${(item.DropStory === 1 || item.DropStory === 3) ? '(Story Dropped)' : ''}${!item.approved ? '(Story UnApproved)' : ''}\nZXZX\n${item.Script}\nZCZC\n`;
-    });
-    text = text.replace(/ZCZC\n$/, '');
-    const element = document.createElement("a");
-    const file = new Blob([text], { type: 'text/plain' });
-    element.href = URL.createObjectURL(file);
-    element.download = "_script.txt";
-    document.body.appendChild(element); // Required for this to work in FireFox
-    element.click();
-  }
+
   const saveScript = () => {
     const content = (slugs.map((slug) => slug.Script)).join('\n'); // Join array items into text
     const blob = new Blob([content], { type: 'text/plain' }); // Create a Blob
@@ -650,9 +637,14 @@ export default function Home() {
 
   useEffect(() => {
     fetch('/example.txt')
-      .then((res) => res.text())
-      .then((content) => {
-        console.log(content)
+      .then(res => {
+        // Clone the response to read both text and blob
+        const resClone = res.clone();
+        return Promise.all([res.text(), resClone.blob()]);
+      })
+      .then(([content, blob]) => {
+        const file = new File([blob], 'example.txt', { type: blob.type });
+        setFile(file);
         let bb = [];
         const lines = content.split(/\r?\n/).map(line => line.trim()).filter(line => line !== ""); // Remove empty lines
 
@@ -770,7 +762,7 @@ export default function Home() {
             </label>
             <div>
               {/* {file && !ZXZX && */}
-              {file &&
+              {
                 <label>
                   <input
                     checked={singleScript}
@@ -784,7 +776,6 @@ export default function Home() {
               }
             </div>
           </div>
-          <div><button onClick={exportScript}>Export Script</button></div>
         </div>
         <div style={{ height: '100vh' }}>
           <div
@@ -1188,20 +1179,6 @@ export default function Home() {
                     setStartPosition(e.target.value);
                   }}
                 />
-                <div style={{ display: 'flex', border: '1px solid red' }}>
-                  <div>
-                    CASPAR_HOST:
-                    <input
-                      type="text"
-                      value={CASPAR_HOST}
-                      style={{ width: 100 }}
-                      onChange={(e) => {
-                        setCASPAR_HOST(e.target.value);
-                      }}
-                    />
-                    <button onClick={changeDB_NAME}>Set</button>
-                  </div>
-                </div>
                 <div
                   style={{
                     display: "flex",
