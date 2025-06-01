@@ -729,18 +729,6 @@ export default function Home() {
                     const updatedSlugs = [...slugs]; // Create a copy of the array
                     updatedSlugs[i] = { ...updatedSlugs[i], DropStory: dropStoryValue(val) }; // Modify the object at index i
                     setSlugs(updatedSlugs); // Update state with the modified array
-                    fetch('/api/setDropedStory', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ dropstory: dropStoryValue(val), ScriptID: val.ScriptID, }),
-                    })
-                      .then(response => response.json())
-                      .then(data => {
-                        console.log('Success:', data);
-                      })
-                      .catch(error => {
-                        console.error('Error:', error);
-                      });
                   }}
                 />
                 <span title={'ScriptID:-' + val.ScriptID} style={{ fontSize: 30, }}>{i + 1}</span>{usedStory.includes(val.ScriptID) ? '✅' : ' '}
