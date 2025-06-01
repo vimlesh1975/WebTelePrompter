@@ -32,7 +32,6 @@ export default function Home() {
 
   const [singleScript, setSingleScript] = useState(false);
   const [file, setFile] = useState(null);
-  const [ZXZX, setZXZX] = useState(false);
   const storyLines = useSelector((state) => state.storyLinesReducer.storyLines);
   const crossedLines = useSelector((state) => state.crossedLinesReducer.crossedLines);
   const [startPosition, setStartPosition] = useState(355);
@@ -524,8 +523,6 @@ export default function Home() {
       reader.onload = (e) => {
         const content = e.target.result;
         const hasZXZX = /ZXZX/i.test(content);
-        setZXZX(hasZXZX);
-
         if (hasZXZX) {
           const aa = content.split(/ZCZC/i);
           bb = aa.map((item, index) => {
