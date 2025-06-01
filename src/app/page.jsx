@@ -660,6 +660,15 @@ export default function Home() {
       <div style={{ display: "flex" }}>
         <div style={{ height: '100vh' }}>
           <div>
+            <label>
+              {
+                <input
+                  type="file"
+                  accept=".txt,.docx"
+                  onChange={handleFileChange}
+                />
+              }
+            </label>
             {slugs?.length} Slugs
 
           </div>
@@ -721,17 +730,8 @@ export default function Home() {
           </div>
           <button onClick={() => { setUsedStory([]) }}>Reset used story status</button>
           <div>
-            <label>
-              {
-                <input
-                  type="file"
-                  accept=".txt,.docx"
-                  onChange={handleFileChange}
-                />
-              }
-            </label>
+
             <div>
-              {/* {file && !ZXZX && */}
               {
                 <label>
                   <input

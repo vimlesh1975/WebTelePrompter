@@ -12,7 +12,7 @@ Double click start Prompter.bat file from unzipped teleprompter folder
 Open http://localhost:5000 in browser
 
 
-choose a text file. Double click on required slug name, and click on required speed like 1 to start. Right click to stop and play with previous speed.
+choose a text or Docx file. Double click on required slug name, and click on required speed like 1 to start. Right click to stop and play with previous speed.
 
 Teleprompter can be seen vertically scrolling on screen in the software itself.
 
@@ -27,3 +27,9 @@ Teleprompter can be seen vertically scrolling on screen in the software itself.
 5. Setting of Font size and start position, bg color, font color can be done by clicking show setting button.
 
 6. Shuttle pro setting should be imported from file in teleprompter folder ShuttleProSettingsForGoogle Chrome.pref file.
+
+7. Mobile controller can be opened in http://[local_Ip]:5000/m
+
+8. Slug contents can be edited and saved as new text file in download directoy.
+
+9. Slug can be edited by speaking on microphone also, That can be translated also.
