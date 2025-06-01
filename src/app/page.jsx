@@ -52,7 +52,6 @@ export default function Home() {
   const [doubleClickedPosition, setDoubleClickedPosition] = useState(0);
   const [fontSize, setFontSize] = useState(39);
   const [stopAfterStoryChange, setStopAfterStoryChange] = useState(false);
-  const [CASPAR_HOST, setCASPAR_HOST] = useState('127.0.0.1');
   const [showSettings, setShowSettings] = useState(false);
   const [keyPressed, setKeyPressed] = useState('');
   const newWindowRef = useRef(null);
@@ -163,24 +162,6 @@ export default function Home() {
     };
   }, [keyPressed]);
 
-  const changeDB_NAME = async () => {
-    try {
-      const str = { DB_NAME, DB_HOST, CASPAR_HOST }
-      const requestOptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json", // Specify the content type as JSON
-        },
-        body: JSON.stringify(str), // Convert the data to JSON format
-      };
-      await fetch("/api/setdbname", requestOptions);
-      setTimeout(() => {
-        fetchNewsId()
-      }, 2000);
-    } catch (error) {
-      console.error(error);
-    }
-  }
   const handleTextareaKeyDown = (event) => {
     if (event.code === 'Space') {
       event.stopPropagation(); // Prevent spacebar from bubbling to document
@@ -739,18 +720,7 @@ export default function Home() {
             ))}
           </div>
           <button onClick={() => { setUsedStory([]) }}>Reset used story status</button>
-          <div title={`Text file should be like this
-            Slugname1
-            ZXZX
-            Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 Stroty1 
-            ZCZC
-            Slugname2
-            ZXZX
-            Story2 Story2 Story2 Story2 Story2 Story2 Story2 Story2 Story2 Story2 Story2 Story2 
-            ZCZC
-            Slugname3
-            ZXZX
-            Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 Story3 `}>
+          <div>
             <label>
               {
                 <input
@@ -1137,7 +1107,7 @@ export default function Home() {
                 {showNewWindow3 ? "Close Full Screen" : "Open Full Screen"}
               </button>
               <button onClick={() => {
-                window.open('/CasparcgOutput2', '', `width=${scrollWidth},height=${scrollHeight + 40}`);
+                window.open('/WebSocketOutput', '', `width=${scrollWidth},height=${scrollHeight + 40}`);
                 setTimeout(() => {
 
                   const socket = socketRef.current;
@@ -1158,7 +1128,7 @@ export default function Home() {
                   socket.emit('scrollingTextStyle', scrollingTextStyle);
 
                 }, 3000);
-              }}>Test</button>
+              }}>WebSocketOutput</button>
             </div>
             <button onClick={() => setShowSettings(val => !val)}>{showSettings ? 'Hide Setting' : 'Show Setting'}</button>
             <div style={{ display: showSettings ? '' : 'none' }}>
