@@ -30,7 +30,6 @@ const ScrollView = ({
                         <div>{`Cur: ${currentStoryNumber} (${currentStoryNumber}/${slugs?.length})`}</div>
                         <div>{newsReaderText}</div>
                         <div><Count currentStoryNumber={currentStoryNumber} /></div>
-                        <div>ScrollView</div>
                         <div>{showClock ? '' : '.'}</div>
                         <div style={{ display: showClock ? 'inline' : 'none', color: 'red' }}><Clock /></div>
                         <div>{crossedLines}/{storyLines[currentStoryNumber - 1]}</div>

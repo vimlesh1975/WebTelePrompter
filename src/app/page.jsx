@@ -772,7 +772,8 @@ export default function Home() {
               }
             </label>
             <div>
-              {file && !ZXZX &&
+              {/* {file && !ZXZX && */}
+              {file &&
                 <label>
                   <input
                     checked={singleScript}
@@ -901,44 +902,30 @@ export default function Home() {
                 {isVideoNndCGPresent(slugs[currentSlug])}
               </div>
             )}
-
-            {(file) ?
-              <div>
-                <textarea
-                  ref={textarea1Ref}
-                  dir={isRTL ? 'rtl' : 'ltr'}
-                  onKeyDown={handleTextareaKeyDown}
-                  value={slugs?.[currentSlug]?.Script ?? ''}
-                  style={{
-                    backgroundColor: '#e0e0d2',
-                    fontSize: `${fontSize}px`,
-                    lineHeight: `${fontSize * 1.5}px`,
-                    width: 702.22,
-                    height: 510,
-                    resize: 'none',
-                    fontFamily: currentFont,
-                    fontWeight: fontBold ? 'bold' : 'normal',
-                  }}
-                  onChange={(e) => {
-                    const aa = currentSlug;
-                    const updatedSlugs = [...slugs]; // Create a copy of the array
-                    updatedSlugs[currentSlug] = { ...updatedSlugs[currentSlug], Script: e.target.value }; // Modify the object at index i
-                    setSlugs(updatedSlugs);
-                  }}
-                />
-              </div> :
-              <div dir={isRTL ? 'rtl' : 'ltr'}
+            <div>
+              <textarea
+                ref={textarea1Ref}
+                dir={isRTL ? 'rtl' : 'ltr'}
+                onKeyDown={handleTextareaKeyDown}
+                value={slugs?.[currentSlug]?.Script ?? ''}
                 style={{
+                  backgroundColor: '#e0e0d2',
                   fontSize: `${fontSize}px`,
                   lineHeight: `${fontSize * 1.5}px`,
                   width: 702.22,
-                  overflow: "hidden",
-                  fontWeight: fontBold ? 'bold' : 'normal',
+                  height: 510,
+                  resize: 'none',
                   fontFamily: currentFont,
-                }}>
-                {(slugs?.[currentSlug]?.Script)?.trim() ?? ''}
-              </div>
-            }
+                  fontWeight: fontBold ? 'bold' : 'normal',
+                }}
+                onChange={(e) => {
+                  const aa = currentSlug;
+                  const updatedSlugs = [...slugs]; // Create a copy of the array
+                  updatedSlugs[currentSlug] = { ...updatedSlugs[currentSlug], Script: e.target.value }; // Modify the object at index i
+                  setSlugs(updatedSlugs);
+                }}
+              />
+            </div>
           </div>
           <div style={{ fontSize: 16, fontWeight: "normal", position: 'absolute', top: 770, }}>
             {file && <div><button onClick={saveScript}>Save Script</button></div>}
