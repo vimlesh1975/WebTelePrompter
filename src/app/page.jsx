@@ -143,24 +143,7 @@ export default function Home() {
   useEffect(() => {
     readFile(file);
   }, [singleScript])
-  useEffect(() => {
-    const handleKeyPress = (event) => {
-      if (event.key === 'Enter') {
-        handleDoubleClick(parseInt(keyPressed) - 1);
-        setKeyPressed('');
-      }
-      else {
-        if (!isNaN(event.key)) {
-          setKeyPressed(val => val + event.key);
-        }
-      }
-    };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress);
-    };
-  }, [keyPressed]);
 
   const handleTextareaKeyDown = (event) => {
     if (event.code === 'Space') {
@@ -199,7 +182,7 @@ export default function Home() {
         JSON.stringify({ fontSize, startPosition, isRTL, bgColor, fontColor, fontBold, currentFont })
       );
     }
-  }, []);
+  }, [bgColor, fontColor, fontBold, currentFont, fontSize, startPosition, isRTL]);
   useEffect(() => {
     setTimeout(() => {
       const savedData = localStorage.getItem("WebTelePrompter");
@@ -252,19 +235,8 @@ export default function Home() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [speed, tempSpeed]);
-  const fetchNewsId = async () => {
-    try {
-      const res = await fetch("/api/newsid");
-      const data = await res.json();
-      setRunOrderTitles(data.data);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  const isVideoNndCGPresent = (slug) => {
-    return ``;
-  };
-  const fetchAllContent = (slicedSlugs, startNumber) => {
+
+  const fetchAllContent = useCallback((slicedSlugs, startNumber) => {
     if (!Array.isArray(slicedSlugs) || slicedSlugs.length === 0) {
       return;
     }
@@ -272,15 +244,13 @@ export default function Home() {
     const data1 = new Array(slicedSlugs.length * 3);
     try {
       slicedSlugs.forEach((slug, i) => {
-
-        if ((slug.DropStory === 0 || slug.DropStory === 2) && (slug?.Approval)) {
-          data1[i * 3] = `${startNumber + i + 1} ${slug?.SlugName}${isVideoNndCGPresent(slug)
-            }`;
-          data1[i * 3 + 1] = slug.Script ? `${slug.Script?.trim().split('$$$$')[0]}` : '';
+        if ((slug.DropStory === 0 || slug.DropStory === 2) && slug?.Approval) {
+          data1[i * 3] = `${startNumber + i + 1} ${slug?.SlugName}`;
+          data1[i * 3 + 1] = slug.Script ? `${slug.Script.trim().split('$$$$')[0]}` : '';
           data1[i * 3 + 2] = `--------------`;
         } else {
-          data1[i * 3] = `${startNumber + i + 1} ${!(slug?.DropStory === 0 || slug?.DropStory === 2) ? "Story Dropped" : "Story UnApproved"}`;
-
+          data1[i * 3] = `${startNumber + i + 1} ${!(slug?.DropStory === 0 || slug?.DropStory === 2) ? "Story Dropped" : "Story UnApproved"
+            }`;
           data1[i * 3 + 1] = ` `;
           data1[i * 3 + 2] = ``;
         }
@@ -290,14 +260,14 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching content:", error);
     }
-  };
+  }, [setAllContent]);
 
 
-  const handleDoubleClick = (i) => {
+  const handleDoubleClick = useCallback((i) => {
     if (i === 0) {
       setUsedStory(val => [...val, slugs[0]?.ScriptID]);
     }
-    // setStopOnNext(true); // Signal to skip the callback
+
     if (i < slugs.length) {
       const newSlugs = slugs.slice(i);
       fetchAllContent(newSlugs, i);
@@ -308,7 +278,18 @@ export default function Home() {
       setDoubleClickedPosition(i);
       setNewPosition(startPosition);
     }
-  };
+  }, [
+    slugs,
+    fetchAllContent,
+    setSpeed,
+    setCurrentStoryNumber,
+    setLoggedPositions,
+    setDoubleClickedPosition,
+    setNewPosition,
+    setUsedStory,
+    startPosition,
+  ]);
+
   const fromStart = () => {
     setCurrentSlug(0);
     handleDoubleClick(0);
@@ -368,7 +349,7 @@ export default function Home() {
     const updatedStories = [...usedStory, slugs[currentStoryNumber - 1]?.ScriptID];
     const uniqueStories = [...new Set(updatedStories.filter((item) => item !== null))];
     setUsedStory(uniqueStories);
-  }, [currentStoryNumber]);
+  }, [currentStoryNumber, slugs, usedStory]);
 
   useEffect(() => {
     const socket = socketRef.current;
@@ -653,8 +634,25 @@ export default function Home() {
 
       })
       .catch((err) => console.error('Error reading file:', err));
-  }, []);
+  }, [fetchAllContent, startPosition]);
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.key === 'Enter') {
+        handleDoubleClick(parseInt(keyPressed) - 1);
+        setKeyPressed('');
+      }
+      else {
+        if (!isNaN(event.key)) {
+          setKeyPressed(val => val + event.key);
+        }
+      }
+    };
 
+    window.addEventListener('keydown', handleKeyPress);
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [keyPressed, handleDoubleClick]);
   return (
     <div style={{ overflow: "hidden", backgroundColor: '#e0e0d2', }}>
       <div style={{ display: "flex" }}>
@@ -723,7 +721,6 @@ export default function Home() {
                 >
                   {val.SlugName}{" "}
                 </label>{" "}
-                <label style={{ marginRight: 0, fontSize: 12 }}>{isVideoNndCGPresent(val)}</label>
                 <br />
               </div>
             ))}
@@ -857,7 +854,6 @@ export default function Home() {
                 }}
               >
                 {currentSlug + 1} {currentSlugName}
-                {isVideoNndCGPresent(slugs[currentSlug])}
               </div>
             )}
             <div>
