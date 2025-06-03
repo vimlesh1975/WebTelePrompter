@@ -18,7 +18,7 @@ aa.onConnected = () => {
 
 
 
-export async function POST(req, res) {
+export async function POST(req) {
   socket.emit('ServerConnectionStatus', aa.connected);
   const body = await req.json();
   // console.log(body)

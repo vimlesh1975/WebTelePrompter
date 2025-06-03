@@ -17,7 +17,7 @@ function NewWindowforfullscreen({ children, onClose, newWindowRef, scrollWidth, 
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
-    }, []);
+    }, [newWindowRef]);
 
     useEffect(() => {
         if (!newWindowRef.current || newWindowRef.current.closed) {
@@ -70,7 +70,7 @@ function NewWindowforfullscreen({ children, onClose, newWindowRef, scrollWidth, 
         return () => {
             newWindowRef.current.removeEventListener('beforeunload', onClose);
         };
-    }, []);
+    }, [newWindowRef, scrollWidth, scrollHeight, onClose]);
 
     const childrenWithProps = React.Children.map(children, (child) =>
         cloneElement(child, { scaleFactor })

@@ -139,7 +139,7 @@ export default function Home() {
     return () => {
       window.removeEventListener('message', messageHandler);
     };
-  }, [focusedInput, file]);
+  }, [focusedInput, file, currentSlug, slugs]);
   useEffect(() => {
     readFile(file);
   }, [singleScript])
@@ -877,7 +877,6 @@ export default function Home() {
                   fontWeight: fontBold ? 'bold' : 'normal',
                 }}
                 onChange={(e) => {
-                  const aa = currentSlug;
                   const updatedSlugs = [...slugs]; // Create a copy of the array
                   updatedSlugs[currentSlug] = { ...updatedSlugs[currentSlug], Script: e.target.value }; // Modify the object at index i
                   setSlugs(updatedSlugs);
