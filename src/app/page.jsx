@@ -25,7 +25,7 @@ export default function Home() {
   const [fontList, setFontList] = useState(fontLists);
   const [currentFont, setCurrentFont] = useState("Times New Roman");
   const [isRTL, setIsRTL] = useState(false);
-  const [bgColor, setbgColor] = useState('black');
+  const [bgColor, setbgColor] = useState('#000000');
   const [fontColor, setFontColor] = useState('#ffffff');
   const [fontBold, setFontBold] = useState(false);
   const socketRef = useRef(null);
@@ -94,11 +94,16 @@ export default function Home() {
         .catch((err) => console.error(err));
     }
   }, []);
+
   useEffect(() => {
     const addr = `${window.location.origin}/SpeechToText`;
     if (iframeRef.current) {
       iframeRef.current.src = addr;
     }
+  }, [])
+
+  useEffect(() => {
+
     const handleFocus = (event) => {
       if (textarea1Ref.current) textarea1Ref.current.style.borderColor = 'red';
       event.target.style.borderColor = 'red';
@@ -139,34 +144,19 @@ export default function Home() {
     return () => {
       window.removeEventListener('message', messageHandler);
     };
-  }, [focusedInput, file]);
-  useEffect(() => {
-    readFile(file);
-  }, [singleScript])
-  useEffect(() => {
-    const handleKeyPress = (event) => {
-      if (event.key === 'Enter') {
-        handleDoubleClick(parseInt(keyPressed) - 1);
-        setKeyPressed('');
-      }
-      else {
-        if (!isNaN(event.key)) {
-          setKeyPressed(val => val + event.key);
-        }
-      }
-    };
+  }, [focusedInput, file, currentSlug, slugs]);
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress);
-    };
-  }, [keyPressed]);
+
+
+
 
   const handleTextareaKeyDown = (event) => {
     if (event.code === 'Space') {
       event.stopPropagation(); // Prevent spacebar from bubbling to document
     }
   };
+
+  // Read from localStorage ONLY ONCE when component mounts
   useEffect(() => {
     const savedData = localStorage.getItem("WebTelePrompter");
     if (savedData) {
@@ -193,24 +183,35 @@ export default function Home() {
       if (dataObject.currentFont !== undefined) {
         setCurrentFont(dataObject.currentFont);
       }
-    } else {
-      localStorage.setItem(
-        "WebTelePrompter",
-        JSON.stringify({ fontSize, startPosition, isRTL, bgColor, fontColor, fontBold, currentFont })
-      );
     }
-  }, []);
+  }, []); // ⬅️ Run only once on mount
+
+  // Save to localStorage whenever relevant state changes (debounced)
   useEffect(() => {
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       const savedData = localStorage.getItem("WebTelePrompter");
       const dataObject = savedData ? JSON.parse(savedData) : {};
 
       localStorage.setItem(
         "WebTelePrompter",
-        JSON.stringify({ ...dataObject, fontSize, startPosition, isRTL, bgColor, fontColor, fontBold, currentFont })
+        JSON.stringify({
+          ...dataObject,
+          fontSize,
+          startPosition,
+          isRTL,
+          bgColor,
+          fontColor,
+          fontBold,
+          currentFont,
+        })
       );
-    }, 1000);
+    }, 500); // shorter debounce is usually enough
+
+    return () => clearTimeout(timeoutId); // cleanup previous timeout if values change rapidly
   }, [fontSize, startPosition, isRTL, bgColor, fontColor, fontBold, currentFont]);
+
+
+
   const handleCloseNewWindow = () => {
     setShowNewWindow(false);
   };
@@ -252,19 +253,8 @@ export default function Home() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [speed, tempSpeed]);
-  const fetchNewsId = async () => {
-    try {
-      const res = await fetch("/api/newsid");
-      const data = await res.json();
-      setRunOrderTitles(data.data);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  const isVideoNndCGPresent = (slug) => {
-    return ``;
-  };
-  const fetchAllContent = (slicedSlugs, startNumber) => {
+
+  const fetchAllContent = useCallback((slicedSlugs, startNumber) => {
     if (!Array.isArray(slicedSlugs) || slicedSlugs.length === 0) {
       return;
     }
@@ -272,15 +262,13 @@ export default function Home() {
     const data1 = new Array(slicedSlugs.length * 3);
     try {
       slicedSlugs.forEach((slug, i) => {
-
-        if ((slug.DropStory === 0 || slug.DropStory === 2) && (slug?.Approval)) {
-          data1[i * 3] = `${startNumber + i + 1} ${slug?.SlugName}${isVideoNndCGPresent(slug)
-            }`;
-          data1[i * 3 + 1] = slug.Script ? `${slug.Script?.trim().split('$$$$')[0]}` : '';
+        if ((slug.DropStory === 0 || slug.DropStory === 2) && slug?.Approval) {
+          data1[i * 3] = `${startNumber + i + 1} ${slug?.SlugName}`;
+          data1[i * 3 + 1] = slug.Script ? `${slug.Script.trim().split('$$$$')[0]}` : '';
           data1[i * 3 + 2] = `--------------`;
         } else {
-          data1[i * 3] = `${startNumber + i + 1} ${!(slug?.DropStory === 0 || slug?.DropStory === 2) ? "Story Dropped" : "Story UnApproved"}`;
-
+          data1[i * 3] = `${startNumber + i + 1} ${!(slug?.DropStory === 0 || slug?.DropStory === 2) ? "Story Dropped" : "Story UnApproved"
+            }`;
           data1[i * 3 + 1] = ` `;
           data1[i * 3 + 2] = ``;
         }
@@ -290,14 +278,14 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching content:", error);
     }
-  };
+  }, [setAllContent]);
 
 
-  const handleDoubleClick = (i) => {
+  const handleDoubleClick = useCallback((i) => {
     if (i === 0) {
       setUsedStory(val => [...val, slugs[0]?.ScriptID]);
     }
-    // setStopOnNext(true); // Signal to skip the callback
+
     if (i < slugs.length) {
       const newSlugs = slugs.slice(i);
       fetchAllContent(newSlugs, i);
@@ -308,7 +296,18 @@ export default function Home() {
       setDoubleClickedPosition(i);
       setNewPosition(startPosition);
     }
-  };
+  }, [
+    slugs,
+    fetchAllContent,
+    setSpeed,
+    setCurrentStoryNumber,
+    setLoggedPositions,
+    setDoubleClickedPosition,
+    setNewPosition,
+    setUsedStory,
+    startPosition,
+  ]);
+
   const fromStart = () => {
     setCurrentSlug(0);
     handleDoubleClick(0);
@@ -362,13 +361,15 @@ export default function Home() {
 
 
   useEffect(() => {
-    if (slugs[currentStoryNumber - 1]?.DropStory === 1 || slugs[currentStoryNumber - 1]?.DropStory === 3) {
-      return;
-    }
-    const updatedStories = [...usedStory, slugs[currentStoryNumber - 1]?.ScriptID];
-    const uniqueStories = [...new Set(updatedStories.filter((item) => item !== null))];
-    setUsedStory(uniqueStories);
-  }, [currentStoryNumber]);
+    const slug = slugs[currentStoryNumber - 1];
+    if (!slug || slug.DropStory === 1 || slug.DropStory === 3) return;
+
+    const newScriptID = slug.ScriptID;
+    if (!newScriptID || usedStory.includes(newScriptID)) return;
+
+    setUsedStory(prev => [...prev, newScriptID]);
+  }, [currentStoryNumber, slugs, usedStory]);
+
 
   useEffect(() => {
     const socket = socketRef.current;
@@ -459,38 +460,43 @@ export default function Home() {
       return 2;
     }
   }
-  const readFile = (selectedFile) => {
+
+  const readFile = useCallback((selectedFile) => {
     if (!selectedFile) return;
+
     const reader = new FileReader();
     let bb = [];
 
     if (selectedFile.type !== 'text/plain') {
+      // DOCX file handling
       reader.onload = function (event) {
         const arrayBuffer = event.target.result;
 
         mammoth.extractRawText({ arrayBuffer: arrayBuffer })
           .then(function (result) {
-            const content = result.value; // extracted text
-            const lines = content.split(/\r?\n/).map(line => line.trim()).filter(line => line !== ""); // Remove empty lines
-            if (singleScript) {
-              bb = [{ ...fixdata, ScriptID: dummyScriptid, SlugName: selectedFile.name, Script: content }];
-              setSlugs(bb);
+            const content = result.value;
+            const lines = content.split(/\r?\n/).map(line => line.trim()).filter(line => line !== "");
 
-            }
-            else {
+            if (singleScript) {
+              bb = [{
+                ...fixdata,
+                ScriptID: dummyScriptid,
+                SlugName: selectedFile.name,
+                Script: content
+              }];
+            } else {
               bb = lines.map((line, index) => {
-                const words = line.split(/\s+/).slice(0, 3).join(" "); // Extract first three words
+                const words = line.split(/\s+/).slice(0, 3).join(" ");
                 return {
                   ...fixdata,
                   ScriptID: dummyScriptid + index,
-                  SlugName: words || `Slug${index + 1}`, // Fallback if line is empty
+                  SlugName: words || `Slug${index + 1}`,
                   Script: line
                 };
               });
-              setSlugs(bb);
-
             }
 
+            setSlugs(bb);
           })
           .catch(function (err) {
             console.error("Error reading docx:", err);
@@ -499,11 +505,12 @@ export default function Home() {
 
       reader.readAsArrayBuffer(selectedFile);
 
-    }
-    else {
+    } else {
+      // TXT file handling
       reader.onload = (e) => {
         const content = e.target.result;
         const hasZXZX = /ZXZX/i.test(content);
+
         if (hasZXZX) {
           const aa = content.split(/ZCZC/i);
           bb = aa.map((item, index) => {
@@ -518,28 +525,35 @@ export default function Home() {
             };
           });
         } else {
+          const lines = content.split(/\r?\n/).map(line => line.trim()).filter(line => line !== "");
 
-          const lines = content.split(/\r?\n/).map(line => line.trim()).filter(line => line !== ""); // Remove empty lines
           if (singleScript) {
-            bb = [{ ...fixdata, ScriptID: dummyScriptid, SlugName: selectedFile.name, Script: content }];
-          }
-          else {
+            bb = [{
+              ...fixdata,
+              ScriptID: dummyScriptid,
+              SlugName: selectedFile.name,
+              Script: content
+            }];
+          } else {
             bb = lines.map((line, index) => {
-              const words = line.split(/\s+/).slice(0, 3).join(" "); // Extract first three words
+              const words = line.split(/\s+/).slice(0, 3).join(" ");
               return {
                 ...fixdata,
                 ScriptID: dummyScriptid + index,
-                SlugName: words || `Slug${index + 1}`, // Fallback if line is empty
+                SlugName: words || `Slug${index + 1}`,
                 Script: line
               };
             });
           }
         }
+
         setSlugs(bb);
       };
+
       reader.readAsText(selectedFile);
     }
-  };
+  }, [setSlugs, singleScript]);
+
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
@@ -653,7 +667,39 @@ export default function Home() {
 
       })
       .catch((err) => console.error('Error reading file:', err));
-  }, []);
+  }, [fetchAllContent, startPosition]);
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.key === 'Enter') {
+        handleDoubleClick(parseInt(keyPressed) - 1);
+        setKeyPressed('');
+      }
+      else {
+        if (!isNaN(event.key)) {
+          setKeyPressed(val => val + event.key);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [keyPressed, handleDoubleClick]);
+
+
+  useEffect(() => {
+    readFile(file);
+  }, [singleScript, file, readFile]);
+  const handleBgColorChange = (color) => {
+    setbgColor(color);
+    socketRef.current?.emit('bgColor', color);
+  };
+
+  const handleFontColorChange = (color) => {
+    setFontColor(color);
+    socketRef.current?.emit('fontColor', color);
+  };
 
   return (
     <div style={{ overflow: "hidden", backgroundColor: '#e0e0d2', }}>
@@ -723,7 +769,6 @@ export default function Home() {
                 >
                   {val.SlugName}{" "}
                 </label>{" "}
-                <label style={{ marginRight: 0, fontSize: 12 }}>{isVideoNndCGPresent(val)}</label>
                 <br />
               </div>
             ))}
@@ -857,7 +902,6 @@ export default function Home() {
                 }}
               >
                 {currentSlug + 1} {currentSlugName}
-                {isVideoNndCGPresent(slugs[currentSlug])}
               </div>
             )}
             <div>
@@ -877,7 +921,6 @@ export default function Home() {
                   fontWeight: fontBold ? 'bold' : 'normal',
                 }}
                 onChange={(e) => {
-                  const aa = currentSlug;
                   const updatedSlugs = [...slugs]; // Create a copy of the array
                   updatedSlugs[currentSlug] = { ...updatedSlugs[currentSlug], Script: e.target.value }; // Modify the object at index i
                   setSlugs(updatedSlugs);
@@ -1160,16 +1203,26 @@ export default function Home() {
                   <UseSocketControls speed={speed} setSpeed={setSpeed} tempSpeed={tempSpeed} setTempSpeed={setTempSpeed} fromStart={fromStart} handleDoubleClick={handleDoubleClick} slugs={slugs} currentStoryNumber={currentStoryNumber} onclickSlug={onclickSlug} previous={previous} next={next} />
                 </div>
               </div>
-              <div>
-                {currentStoryNumber}
-                Bg Color <input type="color" value={bgColor} onChange={e => {
-                  setbgColor(e.target.value);
-                  socketRef.current.emit('bgColor', e.target.value);
-                }} />
-                Font Color:<input type="color" value={fontColor} onChange={e => {
-                  setFontColor(e.target.value);
-                  socketRef.current.emit('fontColor', e.target.value);
-                }} />
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ marginRight: '1rem' }}>
+                  Bg Color:
+                  <input
+                    type="color"
+                    value={bgColor}
+                    onChange={(e) => handleBgColorChange(e.target.value)}
+                    style={{ marginLeft: '0.5rem' }}
+                  />
+                </label>
+
+                <label>
+                  Font Color:
+                  <input
+                    type="color"
+                    value={fontColor}
+                    onChange={(e) => handleFontColorChange(e.target.value)}
+                    style={{ marginLeft: '0.5rem' }}
+                  />
+                </label>
                 <button onClick={() => window.open(`http://${ip}:5000/m`)}>Mobile controllerr</button>
               </div>
             </div>
