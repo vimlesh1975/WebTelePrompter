@@ -154,7 +154,7 @@ const Scroll = ({ scrollContainerStyle, scrollingTextStyle,
 
 
     return (
-        <div style={{ width: scrollWidth, height: scrollHeight, overflow: 'hidden', border: '1px solid black' }}>
+        <div style={{ width: scrollWidth, height: scrollHeight, overflow: 'hidden', border: '1px solid #000000' }}>
             <div style={{
                 width: baseWidth,
                 height: baseHeight,
