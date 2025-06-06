@@ -897,7 +897,7 @@ export default function Home() {
                 style={{
                   backgroundColor: "blue",
                   color: "yellow",
-                  width: 702,
+                  width: 705,
                   fontFamily: 'Times New Roman',
                 }}
               >
@@ -914,7 +914,7 @@ export default function Home() {
                   backgroundColor: '#e0e0d2',
                   fontSize: `${fontSize}px`,
                   lineHeight: `${fontSize * 1.5}px`,
-                  width: 702.22,
+                  width: 705,
                   height: 510,
                   resize: 'none',
                   fontFamily: currentFont,
