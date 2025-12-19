@@ -43,7 +43,7 @@ export default function Home() {
   const [newsReaderText, setNewsReaderText] = useState("Continue...");
   const [showClock, setShowClock] = useState(true);
   const [newPosition, setNewPosition] = useState(startPosition);
-  const [tempSpeed, setTempSpeed] = useState(0);
+  const [tempSpeed, setTempSpeed] = useState(1);
   const [loggedPositions, setLoggedPositions] = useState(new Set());
   const [currentStoryNumber, setCurrentStoryNumber] = useState(-1);
   const [showNewWindow, setShowNewWindow] = useState(false);
