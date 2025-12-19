@@ -49,7 +49,8 @@ function splitText(text, maxBytes = 4900) {
 }
 
 export async function POST(request) {
-    const { text, languageCode, name, profile, pitch } = await request.json();
+    const body = await request.json(); // read ONCE
+    const { text, languageCode, name, pitch, playbackSpeed } = body;
 
     if (!text) {
         return new Response(JSON.stringify({ error: 'No text provided.' }), {
@@ -72,10 +73,9 @@ export async function POST(request) {
                 // audioConfig: { audioEncoding: 'MP3' },
                 audioConfig: {
                     audioEncoding: "LINEAR16",
-                    "sampleRateHertz": 48000,
-                    speakingRate: 1,
+                    sampleRateHertz: 48000,
+                    speakingRate: playbackSpeed,
                     pitch,
-                    effectsProfileId: [profile]
                 }
 
             });
