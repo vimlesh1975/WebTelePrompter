@@ -15,6 +15,12 @@ import mammoth from 'mammoth';
 import 'react-tabs/style/react-tabs.css';
 import { UseSocketControls } from "./components/UseSocketControls";
 
+
+
+import * as pdfjsLib from "pdfjs-dist/build/pdf";
+import pdfWorker from "pdfjs-dist/build/pdf.worker.entry";
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
+
 const scrollHeight = 460;
 const scrollWidth = 782;//scrollHeight * 16 / 9=782.22;
 
@@ -461,13 +467,33 @@ export default function Home() {
     }
   }
 
-  const readFile = useCallback((selectedFile) => {
+  const readFile = useCallback(async (selectedFile) => {
     if (!selectedFile) return;
 
     const reader = new FileReader();
     let bb = [];
 
     if (selectedFile.type !== 'text/plain') {
+
+      const isPDF = selectedFile.type === 'application/pdf' || selectedFile.name.toLowerCase().endsWith('.pdf');
+      if (isPDF) {
+        const buffer = await selectedFile.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+
+        let result = "";
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          result += content.items.map(i => i.str).join(" ");
+
+          console.log(result);
+        }
+
+      }
+
+
+
       // DOCX file handling
       reader.onload = function (event) {
         const arrayBuffer = event.target.result;
