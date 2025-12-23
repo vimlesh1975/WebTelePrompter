@@ -15,11 +15,8 @@ import mammoth from 'mammoth';
 import 'react-tabs/style/react-tabs.css';
 import { UseSocketControls } from "./components/UseSocketControls";
 
+import pdfToText from 'react-pdftotext';
 
-
-import * as pdfjsLib from "pdfjs-dist/build/pdf";
-import pdfWorker from "pdfjs-dist/build/pdf.worker.entry";
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 const scrollHeight = 460;
 const scrollWidth = 782;//scrollHeight * 16 / 9=782.22;
@@ -467,6 +464,30 @@ export default function Home() {
     }
   }
 
+  function cleanPdfText(rawText) {
+    return rawText
+      // Remove control characters
+      .replace(/[\x00-\x1F\x7F]/g, ' ')
+
+      // Fix hyphenated words across lines
+      .replace(/-\s*\n\s*/g, '')
+
+      // Join wrapped lines but keep paragraphs
+      .replace(/(?<!\n)\n(?!\n)/g, ' ')
+
+      // Remove non-text symbols
+      .replace(/[^a-zA-Z0-9.,;:'"!?()\n ]/g, '')
+
+      // Normalize spaces
+      .replace(/\s{2,}/g, ' ')
+
+      // Normalize paragraph breaks
+      .replace(/\n{2,}/g, '\n\n')
+
+      .trim();
+  }
+
+
   const readFile = useCallback(async (selectedFile) => {
     if (!selectedFile) return;
 
@@ -477,57 +498,55 @@ export default function Home() {
 
       const isPDF = selectedFile.type === 'application/pdf' || selectedFile.name.toLowerCase().endsWith('.pdf');
       if (isPDF) {
-        const buffer = await selectedFile.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
-
-        let result = "";
-
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
-          result += content.items.map(i => i.str).join(" ");
-
-          console.log(result);
-        }
-
+        pdfToText(selectedFile)
+          .then(text => {
+            const cleanedText = cleanPdfText(text);
+            console.log('Cleaned Text:', cleanedText);
+          })
+          .catch(error =>
+            console.error('Failed to extract text from PDF:', error)
+          );
       }
 
 
 
       // DOCX file handling
-      reader.onload = function (event) {
-        const arrayBuffer = event.target.result;
+      if (!isPDF) {
+        reader.onload = function (event) {
+          const arrayBuffer = event.target.result;
 
-        mammoth.extractRawText({ arrayBuffer: arrayBuffer })
-          .then(function (result) {
-            const content = result.value;
-            const lines = content.split(/\r?\n/).map(line => line.trim()).filter(line => line !== "");
+          mammoth.extractRawText({ arrayBuffer: arrayBuffer })
+            .then(function (result) {
+              const content = result.value;
+              const lines = content.split(/\r?\n/).map(line => line.trim()).filter(line => line !== "");
 
-            if (singleScript) {
-              bb = [{
-                ...fixdata,
-                ScriptID: dummyScriptid,
-                SlugName: selectedFile.name,
-                Script: content
-              }];
-            } else {
-              bb = lines.map((line, index) => {
-                const words = line.split(/\s+/).slice(0, 3).join(" ");
-                return {
+              if (singleScript) {
+                bb = [{
                   ...fixdata,
-                  ScriptID: dummyScriptid + index,
-                  SlugName: words || `Slug${index + 1}`,
-                  Script: line
-                };
-              });
-            }
+                  ScriptID: dummyScriptid,
+                  SlugName: selectedFile.name,
+                  Script: content
+                }];
+              } else {
+                bb = lines.map((line, index) => {
+                  const words = line.split(/\s+/).slice(0, 3).join(" ");
+                  return {
+                    ...fixdata,
+                    ScriptID: dummyScriptid + index,
+                    SlugName: words || `Slug${index + 1}`,
+                    Script: line
+                  };
+                });
+              }
 
-            setSlugs(bb);
-          })
-          .catch(function (err) {
-            console.error("Error reading docx:", err);
-          });
-      };
+              setSlugs(bb);
+            })
+            .catch(function (err) {
+              console.error("Error reading docx:", err);
+            });
+        };
+      }
+
 
       reader.readAsArrayBuffer(selectedFile);
 
