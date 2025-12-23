@@ -502,6 +502,29 @@ export default function Home() {
           .then(text => {
             const cleanedText = cleanPdfText(text);
             console.log('Cleaned Text:', cleanedText);
+
+            const lines = cleanedText.split(/\r?\n/).map(line => line.trim()).filter(line => line !== "");
+
+            if (singleScript) {
+              bb = [{
+                ...fixdata,
+                ScriptID: dummyScriptid,
+                SlugName: selectedFile.name,
+                Script: cleanedText
+              }];
+            } else {
+              bb = lines.map((line, index) => {
+                const words = line.split(/\s+/).slice(0, 3).join(" ");
+                return {
+                  ...fixdata,
+                  ScriptID: dummyScriptid + index,
+                  SlugName: words || `Slug${index + 1}`,
+                  Script: line
+                };
+              });
+            }
+            setSlugs(bb);
+
           })
           .catch(error =>
             console.error('Failed to extract text from PDF:', error)
