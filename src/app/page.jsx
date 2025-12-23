@@ -501,7 +501,7 @@ export default function Home() {
         pdfToText(selectedFile)
           .then(text => {
             const cleanedText = cleanPdfText(text);
-            console.log('Cleaned Text:', cleanedText);
+            // console.log('Cleaned Text:', cleanedText);
 
             const lines = cleanedText.split(/\r?\n/).map(line => line.trim()).filter(line => line !== "");
 
@@ -778,7 +778,7 @@ export default function Home() {
               {
                 <input
                   type="file"
-                  accept=".txt,.docx"
+                  accept=".txt,.docx,.pdf"
                   onChange={handleFileChange}
                 />
               }
